@@ -10,6 +10,8 @@ using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using System.Data.SqlClient;
 using System.Net.Json;
+using Newtonsoft.Json;
+using project.Business.Base;
 
 namespace project.Presentation.Base
 {
@@ -39,6 +41,8 @@ namespace project.Presentation.Base
                             if (dt.Rows.Count > 0)
                             {
                                 string rightCode = dt.Rows[0]["RightCode"].ToString();
+                                if (rightCode.IndexOf("view") >= 0)
+                                    Buttons += "<a href=\"javascript:;\" onclick=\"view()\" class=\"btn btn-primary radius\"><i class=\"Hui-iconfont\">&#xe695;</i> 查看</a>&nbsp;&nbsp;";
                                 if (rightCode.IndexOf("insert") >= 0)
                                     Buttons += "<a href=\"javascript:;\" onclick=\"insert()\" class=\"btn btn-primary radius\"><i class=\"Hui-iconfont\">&#xe600;</i> 添加</a>&nbsp;&nbsp;";
                                 if (rightCode.IndexOf("update") >= 0)
@@ -46,22 +50,26 @@ namespace project.Presentation.Base
                                 if (rightCode.IndexOf("delete") >= 0)
                                     Buttons += "<a href=\"javascript:;\" onclick=\"del()\" class=\"btn btn-danger radius\"><i class=\"Hui-iconfont\">&#xe6e2;</i> 删除</a>&nbsp;&nbsp;";
                                 if (rightCode.IndexOf("vilad") >= 0)
-                                    Buttons += "<a href=\"javascript:;\" onclick=\"valid()\" class=\"btn btn-primary radius\"><i class=\"Hui-iconfont\">&#xe615;</i> 启用/停用</a>&nbsp;&nbsp;";
+                                    Buttons += "<a href=\"javascript:;\" onclick=\"valid()\" class=\"btn btn-warning radius\"><i class=\"Hui-iconfont\">&#xe631;</i> 启用/停用</a>&nbsp;&nbsp;";
+                                if (rightCode.IndexOf("change") >= 0)
+                                    Buttons += "<a href=\"javascript:;\" onclick=\"change()\" class=\"btn btn-primary radius\"><i class=\"Hui-iconfont\">&#xe68f;</i> 换表</a>&nbsp;&nbsp;";
                                 if (rightCode.IndexOf("vilad") >= 0)
-                                    Buttons += "<a href=\"javascript:;\" onclick=\"print()\" class=\"btn btn-primary radius\"><i class=\"Hui-iconfont\">&#xe615;</i> 标签打印</a>&nbsp;&nbsp;";
+                                    Buttons += "<a href=\"javascript:;\" onclick=\"print()\" class=\"btn btn-primary radius\"><i class=\"Hui-iconfont\">&#xe652;</i> 标签打印</a>&nbsp;&nbsp;";
                             }
                         }
                         else
                         {
+                            Buttons += "<a href=\"javascript:;\" onclick=\"view()\" class=\"btn btn-primary radius\"><i class=\"Hui-iconfont\">&#xe695;</i> 查看</a>&nbsp;&nbsp;";
                             Buttons += "<a href=\"javascript:;\" onclick=\"insert()\" class=\"btn btn-primary radius\"><i class=\"Hui-iconfont\">&#xe600;</i> 添加</a>&nbsp;&nbsp;";
                             Buttons += "<a href=\"javascript:;\" onclick=\"update()\" class=\"btn btn-primary radius\"><i class=\"Hui-iconfont\">&#xe60c;</i> 修改</a>&nbsp;&nbsp;";
                             Buttons += "<a href=\"javascript:;\" onclick=\"del()\" class=\"btn btn-danger radius\"><i class=\"Hui-iconfont\">&#xe6e2;</i> 删除</a>&nbsp;&nbsp;";
-                            Buttons += "<a href=\"javascript:;\" onclick=\"valid()\" class=\"btn btn-primary radius\"><i class=\"Hui-iconfont\">&#xe615;</i> 启用/停用</a>&nbsp;&nbsp;";
-                            Buttons += "<a href=\"javascript:;\" onclick=\"print()\" class=\"btn btn-primary radius\"><i class=\"Hui-iconfont\">&#xe615;</i> 标签打印</a>&nbsp;&nbsp;";
+                            Buttons += "<a href=\"javascript:;\" onclick=\"valid()\" class=\"btn btn-warning radius\"><i class=\"Hui-iconfont\">&#xe631;</i> 启用/停用</a>&nbsp;&nbsp;";
+                            Buttons += "<a href=\"javascript:;\" onclick=\"change()\" class=\"btn btn-primary radius\"><i class=\"Hui-iconfont\">&#xe68f;</i> 换表</a>&nbsp;&nbsp;";
+                            Buttons += "<a href=\"javascript:;\" onclick=\"print()\" class=\"btn btn-primary radius\"><i class=\"Hui-iconfont\">&#xe652;</i> 标签打印</a>&nbsp;&nbsp;";
                         }
 
                         list = createList(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, 1);
-                        
+
                         Business.Base.BusinessLocation loc = new Business.Base.BusinessLocation();
                         MeterLOCNo1Str += "<select id=\"MeterLOCNo1\" class=\"input-text required\" data-valid=\"isNonEmpty\" data-error=\"园区不能为空\">";
                         MeterLOCNo1StrS += "<select id=\"MeterLOCNo1S\" class=\"input-text required size-MINI\" style=\"width:120px\">";
@@ -119,7 +127,7 @@ namespace project.Presentation.Base
             int r = 1;
             sb.Append("<tbody>");
             Business.Base.BusinessMeter bc = new project.Business.Base.BusinessMeter();
-            foreach (Entity.Base.EntityMeter it in bc.GetListQuery(MeterLOCNo1, MeterLOCNo2, MeterLOCNo3, MeterLOCNo4, MeterNo, MeterType, MeterUsageType, MeterRMID,"", MeterSize, MeterStatus, page, pageSize))
+            foreach (Entity.Base.EntityMeter it in bc.GetListQuery(MeterLOCNo1, MeterLOCNo2, MeterLOCNo3, MeterLOCNo4, MeterNo, MeterType, MeterUsageType, MeterRMID, "", MeterSize, MeterStatus, page, pageSize))
             {
                 sb.Append("<tr class=\"text-c\" id=\"" + it.MeterNo + "\">");
                 sb.Append("<td class=\"printck\"><input type=\"checkbox\" class=\"input-text size-MINI\" value=\"" + it.MeterNo + "\" name=\"meterno\" />");
@@ -174,7 +182,88 @@ namespace project.Presentation.Base
                 result = getvalueaction(jp);
             else if (jp.getValue("Type") == "label")
                 result = labelaction(jp);
+            else if (jp.getValue("Type") == "view")
+                result = viewaction(jp);
+            else if (jp.getValue("Type") == "change")
+                result = changeaction(jp);
             return result;
+        }
+
+        private string changeaction(JsonArrayParse jp)
+        {
+            string flag = "1";
+            JsonObjectCollection collection = new JsonObjectCollection();
+            try
+            {
+                var meter = new BusinessMeter();
+                meter.load(jp.getValue("id"));
+                if (string.IsNullOrEmpty(meter.Entity.MeterNo))
+                {
+                    flag = "2";
+                    collection.Add(new JsonStringValue("info", "表记为空！"));
+                }
+                else if (meter.Entity.MeterStatus != "open")
+                {
+                    flag = "2";
+                    collection.Add(new JsonStringValue("info", "该表计当前状态不允许换表！"));
+                }
+                else
+                {
+                    collection.Add(new JsonStringValue("data", JsonConvert.SerializeObject(meter.Entity)));
+                }
+            }
+            catch (Exception ex)
+            {
+                flag = "3";
+                collection.Add(new JsonStringValue("info", ex.ToString()));
+            }
+            collection.Add(new JsonStringValue("type", "change"));
+            collection.Add(new JsonStringValue("flag", flag));
+            return collection.ToString();
+        }
+
+        private string viewaction(JsonArrayParse jp)
+        {
+            string flag = "1";
+            JsonObjectCollection collection = new JsonObjectCollection();
+            try
+            {
+                string sql = string.Format(@"select
+                b.LOCName as Loc1,
+                c.LOCName as Loc2,
+                d.LOCName as Loc3,
+                e.LOCName as Loc4,
+                f.RMNo+'('+a.MeterRMID+')' as Room,
+                a.MeterNo as No,
+                a.MeterName as Name,
+                CONVERT(FLOAT,a.MeterRate) as Rate,
+                a.MeterDigit as Digit,
+                case a.MeterType when 'am' then '电表'  when 'wm' then '水表' end as MeterType,
+                case a.MeterSize when '1' then '大表'  when '2' then '小表' end as SizeType,
+                case a.MeterUsageType when '0' then '公用'  when '1' then '家用' when '2' then '商用'  when '3' then '其他' end as UseType,
+                case a.MeterNatureType when '1' then '居民用电' when '2' then '工业用电'  when '3' then '商业用电' when '4' then '其他用电' end as NatureType,
+                a.Addr
+                from Mstr_Meter a 
+                left join Mstr_Location b on a.MeterLOCNo1=b.LOCNo
+                left join Mstr_Location c on a.MeterLOCNo2=c.LOCNo
+                left join Mstr_Location d on a.MeterLOCNo3=d.LOCNo
+                left join Mstr_Location e on a.MeterLOCNo4=e.LOCNo
+                left join Mstr_Room f on a.MeterRMID=f.RMID where a.MeterNo='{0}'", jp.getValue("id"));
+                DataTable dt = obj.PopulateDataSet(sql).Tables[0];
+                if (dt.Rows.Count > 0)
+                {
+                    collection.Add(new JsonStringValue("data", JsonConvert.SerializeObject(dt)));
+                }
+                else flag = "2";
+
+            }
+            catch (Exception)
+            {
+                flag = "3";
+            }
+            collection.Add(new JsonStringValue("type", "view"));
+            collection.Add(new JsonStringValue("flag", flag));
+            return collection.ToString();
         }
 
         private string labelaction(JsonArrayParse jp)
@@ -185,7 +274,7 @@ namespace project.Presentation.Base
             SqlCommand cmd = null;
             try
             {
-                
+
                 con = Data.Conn();
                 cmd = new SqlCommand("PrintMeterLabel", con);
                 cmd.CommandType = CommandType.StoredProcedure;
@@ -193,7 +282,7 @@ namespace project.Presentation.Base
                 con.Open();
                 cmd.ExecuteNonQuery();
             }
-            catch 
+            catch
             {
                 flag = "0";
             }
@@ -328,7 +417,7 @@ namespace project.Presentation.Base
                     bc.Entity.MeterLOCNo3 = jp.getValue("MeterLOCNo3");
                     bc.Entity.MeterLOCNo4 = jp.getValue("MeterLOCNo4");
                     bc.Entity.MeterRate = ParseDecimalForString(jp.getValue("MeterRate"));
-                    bc.Entity.MeterDigit =ParseIntForString(jp.getValue("MeterDigit"));
+                    bc.Entity.MeterDigit = ParseIntForString(jp.getValue("MeterDigit"));
                     bc.Entity.MeterUsageType = jp.getValue("MeterUsageType");
                     bc.Entity.MeterNatureType = jp.getValue("MeterNatureType");
                     //bc.Entity.MeterReadout = ParseDecimalForString(jp.getValue("MeterReadout"));
@@ -337,7 +426,7 @@ namespace project.Presentation.Base
                     bc.Entity.MeterSize = jp.getValue("MeterSize");
                     bc.Entity.MeterRelatedMeterNo = jp.getValue("MeterRelatedMeterNo");
                     bc.Entity.Addr = jp.getValue("Addr");
-                    
+
                     int r = bc.Save("update");
 
                     if (r <= 0)
