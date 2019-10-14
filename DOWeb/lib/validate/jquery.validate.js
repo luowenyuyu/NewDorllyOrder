@@ -271,7 +271,7 @@
                 validator.showMsg($target, result.errorMsg, 2);
                 $target.attr('data-status', 0)[0].focus();
                 return false;
-            }
+            } 
             return true;
         },
         reset: function (options) {

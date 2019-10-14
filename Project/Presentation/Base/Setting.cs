@@ -103,7 +103,7 @@ namespace project.Presentation.Base
                 {
                     sb.Append("<td><select class=\"input-text size-S\" id=\"SRV" + it.SettingCode + "\" />");
                     Business.Base.BusinessService bs = new Business.Base.BusinessService();
-                    foreach (Entity.Base.EntityService it1 in bs.GetListQuery(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty))
+                    foreach (Entity.Base.EntityService it1 in bs.GetListQuery(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty))
                     {
                         if (it.SRVNo == it1.SRVNo)
                             sb.Append("<option value=\"" + it1.SRVNo + "\" selected=\"selected\">" + it1.SRVName + "</option>");

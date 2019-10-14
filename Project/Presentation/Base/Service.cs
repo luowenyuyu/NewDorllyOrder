@@ -10,6 +10,11 @@ using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using System.Data.SqlClient;
 using System.Net.Json;
+using Newtonsoft.Json;
+using System.Collections.Generic;
+using project.Business.Base;
+using System.Linq;
+using project.Entity.Base;
 
 namespace project.Presentation.Base
 {
@@ -57,63 +62,26 @@ namespace project.Presentation.Base
                             Buttons += "<a href=\"javascript:;\" onclick=\"valid()\" class=\"btn btn-primary radius\"><i class=\"Hui-iconfont\">&#xe615;</i> 启用/停用</a>&nbsp;&nbsp;";
                         }
 
-                        list = createList(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, 1);
+                        list = createList(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, 1);
 
-                        SRVTypeNo1Str = "<select class=\"input-text required\" id=\"SRVTypeNo1\" style=\"width:240px;\" data-valid=\"isNonEmpty\" data-error=\"请选择所属服务大类\">";
-                        SRVTypeNo1Str += "<option value=\"\" selected></option>";
-
-                        SRVTypeNo1StrS = "<select class=\"input-text size-MINI\" id=\"SRVTypeNo1S\" style=\"width:120px;\" >";
-                        SRVTypeNo1StrS += "<option value=\"\" selected>全部</option>";
-                        Business.Base.BusinessServiceType bc1 = new project.Business.Base.BusinessServiceType();
-                        foreach (Entity.Base.EntityServiceType it in bc1.GetListQuery(string.Empty, string.Empty,"null",string.Empty,true))
+                        //第一级服务类别
+                        Business.Base.BusinessServiceType bst = new project.Business.Base.BusinessServiceType();
+                        foreach (Entity.Base.EntityServiceType it in bst.GetListQuery(string.Empty, string.Empty, "null", string.Empty, true))
                         {
-                            SRVTypeNo1Str += "<option value='" + it.SRVTypeNo + "'>" + it.SRVTypeName + "</option>";
-                            SRVTypeNo1StrS += "<option value='" + it.SRVTypeNo + "'>" + it.SRVTypeName + "</option>";
+                            ServiceTypeList += string.Format("<option value='{0}'>{1}</option>", it.SRVTypeNo, it.SRVTypeName);
                         }
-                        SRVTypeNo1Str += "</select>";
-                        SRVTypeNo1StrS += "</select>";
-
-                        SRVTypeNo2Str = "<select class=\"input-text required\" id=\"SRVTypeNo2\" style=\"width:240px;\" data-valid=\"isNonEmpty\" data-error=\"请选择所属服务小类\">";
-                        SRVTypeNo2Str += "<option value=\"\" selected></option>";
-
-                        SRVTypeNo2StrS = "<select class=\"input-text size-MINI\" id=\"SRVTypeNo2S\" style=\"width:120px;\">";
-                        SRVTypeNo2StrS += "<option value=\"\" selected>全部</option>";
-                        //Business.Base.BusinessServiceType bc2 = new project.Business.Base.BusinessServiceType();
-                        //foreach (Entity.Base.EntityServiceType it in bc1.GetListQuery(string.Empty, string.Empty,"empty",string.Empty,true))
-                        //{
-                        //    SRVTypeNo2Str += "<option value='" + it.SRVTypeNo + "'>" + it.SRVTypeName + "</option>";
-                        //    SRVTypeNo2StrS += "<option value='" + it.SRVTypeNo + "'>" + it.SRVTypeName + "</option>";
-                        //}
-                        SRVTypeNo2Str += "</select>";
-                        SRVTypeNo2StrS += "</select>";
-
-                        CANoStr = "<select class=\"input-text required\" id=\"CANo\" style=\"width:240px;\" data-valid=\"isNonEmpty\" data-error=\"财务收费科目不能为空\">";
-                        CANoStr += "<option value=\"\" selected></option>";
-
-                        CANoStrS = "<select class=\"input-text size-MINI\" id=\"CANoS\" style=\"width:120px;\" >";
-                        CANoStrS += "<option value=\"\" selected>全部</option>";
-                        Business.Base.BusinessChargeAccount bc2 = new project.Business.Base.BusinessChargeAccount();
-                        foreach (Entity.Base.EntityChargeAccount it in bc2.GetListQuery(string.Empty, string.Empty, string.Empty))
+                        //服务商
+                        Business.Base.BusinessServiceProvider bsp = new project.Business.Base.BusinessServiceProvider();
+                        foreach (Entity.Base.EntityServiceProvider it in bsp.GetListQuery(string.Empty, string.Empty, true))
                         {
-                            //CANoStr += "<option value='" + it.CANo + "'>" + it.CAName + " - " + it.CASPName + "</option>";
-                            CANoStrS += "<option value='" + it.CANo + "'>" + it.CAName + " - " + it.CASPName + "</option>";
+                            ProviderList += string.Format("<option value='{0}'>{1}</option>", it.SPNo, it.SPShortName);
                         }
-                        CANoStr += "</select>";
-                        CANoStrS += "</select>";
-
-                        SRVSPNoStr = "<select class=\"input-text required\" id=\"SRVSPNo\" style=\"width:240px;\" data-valid=\"isNonEmpty\" data-error=\"请选择服务商\">";
-                        SRVSPNoStr += "<option value=\"\"></option>";
-
-                        SRVSPNoStrS = "<select class=\"input-text size-MINI\" id=\"SRVSPNoS\" style=\"width:120px;\" >";
-                        SRVSPNoStrS += "<option value=\"\" selected>全部</option>";
-                        Business.Base.BusinessServiceProvider tp = new project.Business.Base.BusinessServiceProvider();
-                        foreach (Entity.Base.EntityServiceProvider it in tp.GetListQuery(string.Empty, string.Empty, true))
+                        //公式
+                        Business.Base.BusinessFormula bf = new Business.Base.BusinessFormula();
+                        foreach (EntityFormula it in bf.GetList(string.Empty, string.Empty, string.Empty, 0, 0))
                         {
-                            SRVSPNoStr += "<option value='" + it.SPNo + "'>" + it.SPName + "</option>";
-                            SRVSPNoStrS += "<option value='" + it.SPNo + "'>" + it.SPName + "</option>";
+                            FormulaList += string.Format("<option value='{0}' data-tip='{1}'>{2}</option>", it.ID, it.Explanation, it.Name);
                         }
-                        SRVSPNoStr += "</select>";
-                        SRVSPNoStrS += "</select>";
                     }
                 }
                 else
@@ -132,16 +100,10 @@ namespace project.Presentation.Base
         Data obj = new Data();
         protected string list = "";
         protected string Buttons = "";
-        protected string CAStr = "";
-        protected string SRVTypeNo1Str = "";
-        protected string SRVTypeNo1StrS = "";
-        protected string SRVTypeNo2Str = "";
-        protected string SRVTypeNo2StrS = "";
-        protected string CANoStr = "";
-        protected string CANoStrS = "";
-        protected string SRVSPNoStr = "";
-        protected string SRVSPNoStrS = "";
-        private string createList(string SRVNo, string SRVName, string SRVTypeNo1, string SRVTypeNo2, string SRVSPNo, string CANo, string SRVCalType, int page)
+        protected string ProviderList = string.Empty;
+        protected string ServiceTypeList = string.Empty;
+        protected string FormulaList = string.Empty;
+        private string createList(string SRVNo, string SRVName, string SRVTypeNo1, string SRVTypeNo2, string SRVSPNo, int page)
         {
             System.Text.StringBuilder sb = new System.Text.StringBuilder("");
 
@@ -149,16 +111,17 @@ namespace project.Presentation.Base
             sb.Append("<thead>");
             sb.Append("<tr class=\"text-c\">");
             sb.Append("<th width=\"5%\">序号</th>");
-            sb.Append("<th width='8%'>费用项目编号</th>");
-            sb.Append("<th width='10%'>费用项目名称</th>");
-            sb.Append("<th width='8%'>所属服务大类</th>");
-            sb.Append("<th width='8%'>所属服务子类</th>");
-            sb.Append("<th width='8%'>所属服务商</th>");
+            sb.Append("<th width='8%'>费用编号</th>");
+            sb.Append("<th width='10%'>费用名称</th>");
+            sb.Append("<th width='8%'>服务大类</th>");
+            sb.Append("<th width='8%'>服务子类</th>");
+            sb.Append("<th width='8%'>服务商</th>");
+            sb.Append("<th width='8%'>公式编号</th>");
+            sb.Append("<th width='8%'>费用单价</th>");
             sb.Append("<th width='8%'>取整方式</th>");
-            sb.Append("<th width='5%'>小数位</th>");
-            sb.Append("<th width='10%'>财务收费科目编号</th>");
-            sb.Append("<th width='10%'>财务收费科目名称</th>");
-            sb.Append("<th width='15%'>备注</th>");
+            sb.Append("<th width='10%'>财务科目编号</th>");
+            sb.Append("<th width='10%'>财务科目名称</th>");
+            //sb.Append("<th width='15%'>备注</th>");
             sb.Append("<th width='5%'>状态</th>");
             sb.Append("</tr>");
             sb.Append("</thead>");
@@ -166,7 +129,7 @@ namespace project.Presentation.Base
             int r = 1;
             sb.Append("<tbody>");
             Business.Base.BusinessService bc = new project.Business.Base.BusinessService();
-            foreach (Entity.Base.EntityService it in bc.GetListQuery(SRVNo, SRVName, SRVTypeNo1, SRVTypeNo2, SRVSPNo, CANo, SRVCalType, page, pageSize))
+            foreach (Entity.Base.EntityService it in bc.GetListQuery(SRVNo, SRVName, SRVTypeNo1, SRVTypeNo2, SRVSPNo, page, pageSize))
             {
                 sb.Append("<tr class=\"text-c\" id=\"" + it.SRVNo + "\">");
                 sb.Append("<td align='center'>" + r.ToString() + "</td>");
@@ -175,18 +138,19 @@ namespace project.Presentation.Base
                 sb.Append("<td>" + it.SRVTypeNo1Name + "</td>");
                 sb.Append("<td>" + it.SRVTypeNo2Name + "</td>");
                 sb.Append("<td>" + it.SRVSPName + "</td>");
+                sb.Append("<td>" + it.SRVFormulaID + "</td>");
+                sb.Append("<td>" + it.SRVPrice.ToString("0.####") + "</td>");
                 sb.Append("<td>" + it.SRVRoundTypeName + "</td>");
-                sb.Append("<td>" + it.SRVDecimalPoint.ToString() + "</td>");
-                sb.Append("<td>" + it.CANo + "</td>");
-                sb.Append("<td>" + it.CAName + "</td>");
-                sb.Append("<td>" + it.SRVRemark + "</td>");
+                sb.Append("<td>" + it.SRVFinanceFeeCode + "</td>");
+                sb.Append("<td>" + it.SRVFinanceFeeName + "</td>");
+                //sb.Append("<td>" + it.SRVRemark + "</td>");
                 sb.Append("<td class=\"td-status\"><span class=\"label " + (it.SRVStatus ? "label-success" : "") + " radius\">" + (it.SRVStatus ? "有效" : "已失效") + "</span></td>");
                 sb.Append("</tr>");
                 r++;
             }
             sb.Append("</tbody>");
             sb.Append("</table>");
-            sb.Append(Paginat(bc.GetListCount(SRVNo, SRVName, SRVTypeNo1, SRVTypeNo2, SRVSPNo, CANo, SRVCalType), pageSize, page, 7));
+            sb.Append(Paginat(bc.GetListCount(SRVNo, SRVName, SRVTypeNo1, SRVTypeNo2, SRVSPNo), pageSize, page, 7));
 
             return sb.ToString();
         }
@@ -210,290 +174,236 @@ namespace project.Presentation.Base
                 result = updateaction(jp);
             else if (jp.getValue("Type") == "submit")
                 result = submitaction(jp);
-            else if (jp.getValue("Type") == "select")
-                result = selectaction(jp);
             else if (jp.getValue("Type") == "jump")
                 result = jumpaction(jp);
             else if (jp.getValue("Type") == "valid")
                 result = validaction(jp);
-            else if (jp.getValue("Type") == "getsubtype")
-                result = getsubtypeaction(jp);
-            else if (jp.getValue("Type") == "getsubtypes")
-                result = getsubtypesaction(jp);
-            else if (jp.getValue("Type") == "getcano")
-                result = getcanoaction(jp);
+            else if (jp.getValue("Type") == "getServiceType")
+                result = GetServiceType(jp);
             return result;
         }
 
         private string updateaction(JsonArrayParse jp)
         {
             JsonObjectCollection collection = new JsonObjectCollection();
-            string flag = "1";
+            int flag = 0;
             try
             {
-                Business.Base.BusinessService bc = new project.Business.Base.BusinessService();
-                bc.load(jp.getValue("id"));
-
-                collection.Add(new JsonStringValue("SRVNo", bc.Entity.SRVNo));
-                collection.Add(new JsonStringValue("SRVName", bc.Entity.SRVName));
-                collection.Add(new JsonStringValue("SRVTypeNo1", bc.Entity.SRVTypeNo1));
-                collection.Add(new JsonStringValue("SRVTypeNo1Name", bc.Entity.SRVTypeNo1Name));
-                collection.Add(new JsonStringValue("SRVTypeNo2", bc.Entity.SRVTypeNo2));
-                collection.Add(new JsonStringValue("SRVTypeNo2Name", bc.Entity.SRVTypeNo2Name));
-                collection.Add(new JsonStringValue("SRVSPNo", bc.Entity.SRVSPNo));
-                collection.Add(new JsonStringValue("SRVSPName", bc.Entity.SRVSPName));
-                collection.Add(new JsonStringValue("CANo", bc.Entity.CANo));
-                collection.Add(new JsonStringValue("CAName", bc.Entity.CAName));
-                collection.Add(new JsonStringValue("SRVCalType", bc.Entity.SRVCalType));
-                collection.Add(new JsonStringValue("SRVRoundType", bc.Entity.SRVRoundType));
-                collection.Add(new JsonStringValue("SRVDecimalPoint", bc.Entity.SRVDecimalPoint.ToString()));
-                collection.Add(new JsonStringValue("SRVRate", bc.Entity.SRVRate.ToString("0.####")));
-                collection.Add(new JsonStringValue("SRVTaxRate", bc.Entity.SRVTaxRate.ToString("0.####")));
-                collection.Add(new JsonStringValue("SRVRemark", bc.Entity.SRVRemark));
-                
-                string subtype = "";
-                int row = 0;
-                Business.Base.BusinessServiceType bs = new Business.Base.BusinessServiceType();
-                foreach (Entity.Base.EntityServiceType it in bs.GetListQuery(string.Empty, string.Empty, bc.Entity.SRVTypeNo1,string.Empty,true))
-                {
-                    subtype += it.SRVTypeNo + ":" + it.SRVTypeName + ";";
-                    row++;
-                }
-                collection.Add(new JsonNumericValue("row", row));
-                collection.Add(new JsonStringValue("subtype", subtype));
-
-                string subtype1 = "";
-                int row1 = 0;
-                Business.Base.BusinessChargeAccount ba = new Business.Base.BusinessChargeAccount();
-                foreach (Entity.Base.EntityChargeAccount it in ba.GetListQuery(string.Empty, string.Empty, bc.Entity.SRVSPNo))
-                {
-                    subtype1 += it.CANo + ":" + it.CAName + " - " + it.CASPName + ";";
-                    row1++;
-                }
-                collection.Add(new JsonNumericValue("row1", row1));
-                collection.Add(new JsonStringValue("subtype1", subtype1));
+                Business.Base.BusinessService bs = new project.Business.Base.BusinessService();
+                bs.load(jp.getValue("id"));
+                collection.Add(new JsonStringValue("data", JsonConvert.SerializeObject(bs.Entity)));
             }
-            catch
-            { flag = "2"; }
-
+            catch (Exception ex)
+            {
+                flag = 2;
+                collection.Add(new JsonStringValue("ex", ex.ToString()));
+            }
             collection.Add(new JsonStringValue("type", "update"));
-            collection.Add(new JsonStringValue("flag", flag));
-
+            collection.Add(new JsonNumericValue("flag", flag));
             return collection.ToString();
         }
         private string deleteaction(JsonArrayParse jp)
         {
             JsonObjectCollection collection = new JsonObjectCollection();
-            string flag = "1";
+            int flag = 0;
             try
             {
-                Business.Base.BusinessService bc = new project.Business.Base.BusinessService();
-                bc.load(jp.getValue("id"));
-
-                int r = bc.delete();
-                if (r <= 0)
-                    flag = "2";
+                Business.Base.BusinessService bs = new project.Business.Base.BusinessService();
+                bs.load(jp.getValue("id"));
+                if (bs.delete() <= 0) flag = 1;
             }
-            catch { flag = "2"; }
-
+            catch (Exception ex)
+            {
+                flag = 2;
+                collection.Add(new JsonStringValue("ex", ex.ToString()));
+            }
             collection.Add(new JsonStringValue("type", "delete"));
-            collection.Add(new JsonStringValue("flag", flag));
-            collection.Add(new JsonStringValue("liststr", createList(jp.getValue("SRVNoS"), jp.getValue("SRVNameS"), jp.getValue("SRVTypeNo1S"), jp.getValue("SRVTypeNo2S"),
-                jp.getValue("SRVSPNoS"), jp.getValue("CANoS"), jp.getValue("SRVCalTypeS"), ParseIntForString(jp.getValue("page")))));
-
+            collection.Add(new JsonNumericValue("flag", flag));
             return collection.ToString();
         }
         private string submitaction(JsonArrayParse jp)
         {
             JsonObjectCollection collection = new JsonObjectCollection();
-            string flag = "1";
+            int flag = 1;
+            string msg = string.Empty;
             try
             {
-                Business.Base.BusinessService bc = new project.Business.Base.BusinessService();
-                if (jp.getValue("tp") == "update")
+                BusinessService bs = null;
+                string operation = jp.getValue("operation");
+                if (operation == "insert")
                 {
-                    bc.load(jp.getValue("id"));
-                    bc.Entity.SRVName = jp.getValue("SRVName");
-                    bc.Entity.SRVTypeNo1 = jp.getValue("SRVTypeNo1");
-                    bc.Entity.SRVTypeNo2 = jp.getValue("SRVTypeNo2");
-                    bc.Entity.SRVSPNo = jp.getValue("SRVSPNo");
-                    bc.Entity.CANo = jp.getValue("CANo");
-                    bc.Entity.SRVCalType = jp.getValue("SRVCalType");
-                    bc.Entity.SRVRoundType = jp.getValue("SRVRoundType");
-                    bc.Entity.SRVDecimalPoint = ParseIntForString(jp.getValue("SRVDecimalPoint"));
-                    bc.Entity.SRVRate = ParseDecimalForString(jp.getValue("SRVRate"));
-                    bc.Entity.SRVTaxRate = ParseDecimalForString(jp.getValue("SRVTaxRate"));
-                    bc.Entity.SRVRemark = jp.getValue("SRVRemark");
-                    int r = bc.Save("update");
-                    
-                    if (r <= 0)
-                        flag = "2";
-                }
-                else
-                {
-                    Data obj = new Data();
-                    DataTable dt = obj.PopulateDataSet("select cnt=COUNT(*) from Mstr_Service where SRVNo='" + jp.getValue("SRVNo") + "'").Tables[0];
-                    if (int.Parse(dt.Rows[0]["cnt"].ToString()) > 0)
-                        flag = "3";
-                    else
+                    var entity = JsonConvert.DeserializeObject<EntityService>(jp.getValue("data"));
+                    bs = new BusinessService();
+                    bool isSRVNoExist = false;
+                    try
                     {
-                        bc.Entity.SRVNo = jp.getValue("SRVNo");
-                        bc.Entity.SRVName = jp.getValue("SRVName");
-                        bc.Entity.SRVTypeNo1 = jp.getValue("SRVTypeNo1");;
-                        bc.Entity.SRVTypeNo2 = jp.getValue("SRVTypeNo2");
-                        bc.Entity.SRVSPNo = jp.getValue("SRVSPNo");
-                        bc.Entity.CANo = jp.getValue("CANo");
-                        bc.Entity.SRVCalType = jp.getValue("SRVCalType");
-                        bc.Entity.SRVRoundType = jp.getValue("SRVRoundType");
-                        bc.Entity.SRVDecimalPoint = ParseIntForString(jp.getValue("SRVDecimalPoint"));
-                        bc.Entity.SRVRate = ParseDecimalForString(jp.getValue("SRVRate"));
-                        bc.Entity.SRVTaxRate = ParseDecimalForString(jp.getValue("SRVTaxRate"));
-                        bc.Entity.SRVRemark = jp.getValue("SRVRemark");
-
-                        int r = bc.Save("insert");
-                        if (r <= 0)
-                            flag = "2";
+                        bs.load(entity.SRVNo);
+                        isSRVNoExist = true;
                     }
+                    catch { }
+                    if (!isSRVNoExist)
+                    {
+                        bs = new BusinessService(entity);
+                        if (bs.Save("insert") <= 0) msg = "保存失败！";
+                        else flag = 0;
+                    }
+                    else msg = "编号已存在！";
+                    
                 }
+                else if (operation == "update")
+                {
+                    var entity = JsonConvert.DeserializeObject<EntityService>(jp.getValue("data"));
+                    bs = new BusinessService(entity);
+                    if (bs.Save("update") <= 0) msg = "更新失败！";
+                    else flag = 0;
+                }
+                else msg = "指令有误！";
             }
-            catch { flag = "2"; }
-
+            catch (Exception ex)
+            {
+                flag = 2;
+                collection.Add(new JsonStringValue("ex", ex.ToString()));
+            }
+            //catch (SqlException ex)
+            //{
+            //    if (ex.Number == 2601) msg = "编号重复！";
+            //    else
+            //    {
+            //        flag = 2;
+            //        collection.Add(new JsonStringValue("ex", ex.ToString()));
+            //    }
+            //}
 
             collection.Add(new JsonStringValue("type", "submit"));
-            collection.Add(new JsonStringValue("flag", flag));
-            collection.Add(new JsonStringValue("liststr", createList(jp.getValue("SRVNoS"), jp.getValue("SRVNameS"), jp.getValue("SRVTypeNo1S"), jp.getValue("SRVTypeNo2S"),
-                jp.getValue("SRVSPNoS"), jp.getValue("CANoS"), jp.getValue("SRVCalTypeS"), ParseIntForString(jp.getValue("page")))));
-
-            return collection.ToString();
-        }
-        private string selectaction(JsonArrayParse jp)
-        {
-            JsonObjectCollection collection = new JsonObjectCollection();
-            string flag = "1";
-
-            collection.Add(new JsonStringValue("type", "select"));
-            collection.Add(new JsonStringValue("flag", flag));
-            collection.Add(new JsonStringValue("liststr", createList(jp.getValue("SRVNoS"), jp.getValue("SRVNameS"), jp.getValue("SRVTypeNo1S"), jp.getValue("SRVTypeNo2S"),
-                jp.getValue("SRVSPNoS"), jp.getValue("CANoS"), jp.getValue("SRVCalTypeS"), ParseIntForString(jp.getValue("page")))));
-
+            collection.Add(new JsonNumericValue("flag", flag));
+            collection.Add(new JsonStringValue("msg", msg));
             return collection.ToString();
         }
         private string jumpaction(JsonArrayParse jp)
         {
             JsonObjectCollection collection = new JsonObjectCollection();
-            string flag = "1";
-
+            int flag = 0;
+            try
+            {
+                collection.Add(new JsonStringValue("liststr", createList(jp.getValue("SRVNo"),
+                    jp.getValue("SRVName"), jp.getValue("SRVTypeNo1"), jp.getValue("SRVTypeNo2"),
+                    jp.getValue("SRVSPNo"), ParseIntForString(jp.getValue("page")))));
+            }
+            catch (Exception ex)
+            {
+                flag = 2;
+                collection.Add(new JsonStringValue("ex", ex.ToString()));
+            }
             collection.Add(new JsonStringValue("type", "jump"));
-            collection.Add(new JsonStringValue("flag", flag));
-            collection.Add(new JsonStringValue("liststr", createList(jp.getValue("SRVNoS"), jp.getValue("SRVNameS"), jp.getValue("SRVTypeNo1S"), jp.getValue("SRVTypeNo2S"),
-                jp.getValue("SRVSPNoS"), jp.getValue("CANoS"), jp.getValue("SRVCalTypeS"), ParseIntForString(jp.getValue("page")))));
-
+            collection.Add(new JsonNumericValue("flag", flag));
             return collection.ToString();
         }
         private string validaction(JsonArrayParse jp)
         {
             JsonObjectCollection collection = new JsonObjectCollection();
-            string flag = "1";
+            int flag = 0;
             try
             {
                 Business.Base.BusinessService bc = new project.Business.Base.BusinessService();
                 bc.load(jp.getValue("id"));
                 bc.Entity.SRVStatus = !bc.Entity.SRVStatus;
 
-                int r = bc.valid();
-                if (r <= 0) flag = "2";
-                if (bc.Entity.SRVStatus)
-                    collection.Add(new JsonStringValue("stat", "<span class=\"label label-success radius\">有效</span>"));
+                if (bc.valid() <= 0) flag = 1;
                 else
-                    collection.Add(new JsonStringValue("stat", "<span class=\"label radius\">已失效</span>"));
-                collection.Add(new JsonStringValue("id", jp.getValue("id")));
+                {
+                    if (bc.Entity.SRVStatus)
+                        collection.Add(new JsonStringValue("stat", "<span class=\"label label-success radius\">有效</span>"));
+                    else
+                        collection.Add(new JsonStringValue("stat", "<span class=\"label radius\">已失效</span>"));
+                }
             }
-            catch { flag = "2"; }
-
+            catch (Exception ex)
+            {
+                flag = 2;
+                collection.Add(new JsonStringValue("ex", ex.ToString()));
+            }
+            collection.Add(new JsonStringValue("id", jp.getValue("id")));
             collection.Add(new JsonStringValue("type", "valid"));
-            collection.Add(new JsonStringValue("flag", flag));
+            collection.Add(new JsonNumericValue("flag", flag));
             return collection.ToString();
         }
 
-        private string getsubtypeaction(JsonArrayParse jp)
+        /*
+         * 新增获取下拉列表数据
+         */
+        private string GetServiceType(JsonArrayParse jp)
         {
             JsonObjectCollection collection = new JsonObjectCollection();
-            string flag = "1";
-            string subtype = "";
-            string type = "empty";
-            if (jp.getValue("SRVTypeNo1") != "") type = jp.getValue("SRVTypeNo1");
+            int flag = 0;
             try
             {
-                int row = 0;
-                Business.Base.BusinessServiceType bt = new Business.Base.BusinessServiceType();
-                foreach (Entity.Base.EntityServiceType it in bt.GetListQuery(string.Empty, string.Empty, type, string.Empty, true))
+                string parentNo = string.IsNullOrEmpty(jp.getValue("parentNo")) ? "null" : jp.getValue("parentNo");
+                Business.Base.BusinessServiceType bst = new Business.Base.BusinessServiceType();
+                var serviceList = new List<EntityServiceType>();
+                foreach (EntityServiceType item in bst.GetListQuery(string.Empty, string.Empty, parentNo, string.Empty, true))
                 {
-                    subtype += it.SRVTypeNo + ":" + it.SRVTypeName + ";";
-                    row++;
+                    serviceList.Add(item);
                 }
-
-                collection.Add(new JsonNumericValue("row", row));
-                collection.Add(new JsonStringValue("subtype", subtype));
+                collection.Add(new JsonStringValue("data", JsonConvert.SerializeObject(serviceList.Select(a => new { a.SRVTypeNo, a.SRVTypeName }))));
+                collection.Add(new JsonStringValue("bindID", jp.getValue("bindID")));
+                collection.Add(new JsonStringValue("selectNo", jp.getValue("selectNo")));
             }
-            catch { flag = "2"; }
-
-            collection.Add(new JsonStringValue("type", "getsubtype"));
-            collection.Add(new JsonStringValue("flag", flag));
-
+            catch (Exception ex)
+            {
+                flag = 2;
+                collection.Add(new JsonStringValue("ex", ex.ToString()));
+            }
+            collection.Add(new JsonStringValue("type", "getServiceType"));
+            collection.Add(new JsonNumericValue("flag", flag));
             return collection.ToString();
         }
-        private string getsubtypesaction(JsonArrayParse jp)
+
+        private string GetProvider(JsonArrayParse jp)
         {
             JsonObjectCollection collection = new JsonObjectCollection();
-            string flag = "1";
-            string subtype = "";
-            string type = "empty";
-            if (jp.getValue("SRVTypeNo1") != "") type = jp.getValue("SRVTypeNo1");
+            int flag = 0;
             try
             {
-                int row = 0;
-                Business.Base.BusinessServiceType bt = new Business.Base.BusinessServiceType();
-                foreach (Entity.Base.EntityServiceType it in bt.GetListQuery(string.Empty, string.Empty, type, string.Empty, true))
+                Business.Base.BusinessServiceProvider bsp = new Business.Base.BusinessServiceProvider();
+                var providerList = new List<EntityServiceProvider>();
+                foreach (EntityServiceProvider item in bsp.GetListQuery(string.Empty, string.Empty, true))
                 {
-                    subtype += it.SRVTypeNo + ":" + it.SRVTypeName + ";";
-                    row++;
+                    providerList.Add(item);
                 }
-
-                collection.Add(new JsonNumericValue("row", row));
-                collection.Add(new JsonStringValue("subtype", subtype));
+                collection.Add(new JsonStringValue("data", JsonConvert.SerializeObject(providerList.Select(a => new { a.SPNo, a.SPShortName }))));
             }
-            catch { flag = "2"; }
-
-            collection.Add(new JsonStringValue("type", "getsubtypes"));
-            collection.Add(new JsonStringValue("flag", flag));
-
+            catch (Exception ex)
+            {
+                flag = 2;
+                collection.Add(new JsonStringValue("ex", ex.ToString()));
+            }
+            collection.Add(new JsonStringValue("type", "getProvider"));
+            collection.Add(new JsonNumericValue("flag", flag));
             return collection.ToString();
+
         }
-        private string getcanoaction(JsonArrayParse jp)
+
+        private string GetFormula(JsonArrayParse jp)
         {
             JsonObjectCollection collection = new JsonObjectCollection();
-            string flag = "1";
-            string subtype = "";
-            string type = "empty";
-            if (jp.getValue("SRVSPNo") != "") type = jp.getValue("SRVSPNo");
+            int flag = 0;
             try
             {
-                int row = 0;
-                Business.Base.BusinessChargeAccount bt = new Business.Base.BusinessChargeAccount();
-                foreach (Entity.Base.EntityChargeAccount it in bt.GetListQuery(string.Empty, string.Empty, type))
+                Business.Base.BusinessFormula bf = new Business.Base.BusinessFormula();
+                var formulaList = new List<EntityFormula>();
+                foreach (EntityFormula item in bf.GetList(string.Empty, string.Empty, string.Empty, 0, 0))
                 {
-                    subtype += it.CANo + ":" + it.CAName + " - " + it.CASPName + ";";
-                    row++;
+                    formulaList.Add(item);
                 }
-
-                collection.Add(new JsonNumericValue("row", row));
-                collection.Add(new JsonStringValue("subtype", subtype));
+                collection.Add(new JsonStringValue("data", JsonConvert.SerializeObject(formulaList.Select(a => new { a.ID, a.Name, a.Explanation }))));
             }
-            catch { flag = "2"; }
-
-            collection.Add(new JsonStringValue("type", "getcano"));
-            collection.Add(new JsonStringValue("flag", flag));
-
+            catch (Exception ex)
+            {
+                flag = 2;
+                collection.Add(new JsonStringValue("ex", ex.ToString()));
+            }
+            collection.Add(new JsonStringValue("type", "getFormula"));
+            collection.Add(new JsonNumericValue("flag", flag));
             return collection.ToString();
         }
     }

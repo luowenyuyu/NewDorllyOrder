@@ -305,115 +305,140 @@
         <div class="row">
             <label class="form-label col-2"><span class="c-red">*</span>[旧表]园区：</label>
             <div class="formControls col-3">
-                <input type="text" class="input-text required loc1" disabled="disabled" data-valid="between:0-30" data-error="" />
+                <input type="text" class="input-text  loc1" disabled="disabled" />
             </div>
             <label class="form-label col-2"><span class="c-red">*</span>[新表]园区：</label>
             <div class="formControls col-3">
-                <input type="text" class="input-text required loc1" disabled="disabled" data-valid="between:0-30" data-error="" />
+                <input type="text" class="input-text  loc1" disabled="disabled" />
             </div>
         </div>
         <div class="row">
             <label class="form-label col-2"><span class="c-red">*</span>[旧表]建设期：</label>
             <div class="formControls col-3">
-                <input type="text" class="input-text required loc2" disabled="disabled" data-valid="between:0-30" data-error="" />
+                <input type="text" class="input-text  loc2" disabled="disabled" />
             </div>
             <label class="form-label col-2"><span class="c-red">*</span>[新表]建设期：</label>
             <div class="formControls col-3">
-                <input type="text" class="input-text required loc2" disabled="disabled" data-valid="between:0-30" data-error="" />
+                <input type="text" class="input-text  loc2" disabled="disabled" />
             </div>
         </div>
         <div class="row">
             <label class="form-label col-2"><span class="c-red">*</span>[旧表]楼栋：</label>
             <div class="formControls col-3">
-                <input type="text" class="input-text required loc3" disabled="disabled" data-valid="between:0-30" data-error="" />
+                <input type="text" class="input-text  loc3" disabled="disabled" />
             </div>
             <label class="form-label col-2"><span class="c-red">*</span>[新表]楼栋：</label>
             <div class="formControls col-3">
-                <input type="text" class="input-text required loc3" disabled="disabled" data-valid="between:0-30" data-error="" />
+                <input type="text" class="input-text  loc3" disabled="disabled" />
             </div>
         </div>
         <div class="row">
             <label class="form-label col-2"><span class="c-red">*</span>[旧表]楼层：</label>
             <div class="formControls col-3">
-                <input type="text" class="input-text required loc4" disabled="disabled" data-valid="between:0-30" data-error="" />
+                <input type="text" class="input-text  loc4" disabled="disabled" />
             </div>
             <label class="form-label col-2"><span class="c-red">*</span>[新表]楼层：</label>
             <div class="formControls col-3">
-                <input type="text" class="input-text required loc4" disabled="disabled" data-valid="between:0-30" data-error="" />
+                <input type="text" class="input-text  loc4" disabled="disabled" />
             </div>
         </div>
         <div class="row">
             <label class="form-label col-2"><span class="c-red">*</span>[旧表]房间：</label>
             <div class="formControls col-3">
-                <input type="text" class="input-text required loc5" disabled="disabled" data-valid="between:0-30" data-error="" />
+                <input type="text" class="input-text  loc5" disabled="disabled" />
             </div>
             <label class="form-label col-2"><span class="c-red">*</span>[新表]房间：</label>
             <div class="formControls col-3">
-                <input type="text" class="input-text required loc5" disabled="disabled" data-valid="between:0-30" data-error="" />
+                <input type="text" class="input-text  loc5" disabled="disabled" />
             </div>
         </div>
         <%--  --%>
         <div class="row">
             <label class="form-label col-2"><span class="c-red">*</span>[旧表]表计编号：</label>
             <div class="formControls col-3">
-                <input type="text" class="input-text required meterNo" disabled="disabled" data-valid="between:0-30" data-error="" />
+                <input type="text" class="input-text meterNo" disabled="disabled" />
             </div>
             <label class="form-label col-2"><span class="c-red">*</span>[新表]表计编号：</label>
             <div class="formControls col-3">
-                <input type="text" class="input-text required meterNo" data-valid="between:0-30" data-error="" />
+                <input type="text" class="input-text required meterNo" data-valid="isNonEmpty||between:2-50" data-error="表计编号不能为空||长度2-50" />
             </div>
+            <div class="col-2"></div>
         </div>
         <div class="row">
             <label class="form-label col-2"><span class="c-red">*</span>[旧表]表计名称：</label>
             <div class="formControls col-3">
-                <input type="text" class="input-text required meterName" disabled="disabled" data-valid="between:0-30" data-error="" />
+                <input type="text" class="input-text meterName" disabled="disabled" />
             </div>
             <label class="form-label col-2"><span class="c-red">*</span>[新表]表计名称：</label>
             <div class="formControls col-3">
-                <input type="text" class="input-text required meterName" data-valid="between:0-30" data-error="" />
+                <input type="text" class="input-text required meterName" data-valid="isNonEmpty||between:2-50" data-error="表计名称不能为空||长度2-50" />
             </div>
+            <div class="col-2"></div>
         </div>
         <div class="row">
             <label class="form-label col-2"><span class="c-red">*</span>[旧表]上期读数：</label>
             <div class="formControls col-3">
-                <input type="text" class="input-text required lastRead" disabled="disabled" data-valid="between:0-30" data-error="" />
+                <input type="text" class="input-text lastRead" disabled="disabled" />
             </div>
             <label class="form-label col-2"><span class="c-red">*</span>[新表]起始读数：</label>
             <div class="formControls col-3">
-                <input type="text" class="input-text required startRead" data-valid="between:0-30" data-error="" />
+                <input type="text" class="input-text required startRead" data-valid="isNonEmpty||onlyNum" data-error="起始读数不能为空||必须为数字" />
             </div>
+            <div class="col-2"></div>
         </div>
         <div class="row">
             <label class="form-label col-2"><span class="c-red">*</span>[旧表]换表止度：</label>
             <div class="formControls col-3">
-                <input type="text" class="input-text required endRead" data-valid="between:0-30" data-error="" />
+                <input type="text" class="input-text required endRead" data-valid="isNonEmpty||onlyNum" data-error="换表止度不能为空||必须为数字" onchange="calcReadout()" />
             </div>
+            <div class="col-2"></div>
+        </div>
+        <div class="row">
+            <label class="form-label col-2"><span class="c-red">*</span>[旧表]行度：</label>
+            <div class="formControls col-3">
+                <input type="text" class="input-text required reading" disabled="disabled" data-valid="isNonEmpty||onlyNum" data-error="行度不能为空||必须为数字" />
+            </div>
+            <div class="col-2"></div>
         </div>
         <div class="row">
             <label class="form-label col-2"><span class="c-red">*</span>[旧表]倍率：</label>
             <div class="formControls col-3">
-                <input type="text" class="input-text required rate" disabled="disabled" data-valid="between:0-30" data-error="" />
+                <input type="text" class="input-text rate" disabled="disabled" />
             </div>
             <label class="form-label col-2"><span class="c-red">*</span>[新表]倍率：</label>
             <div class="formControls col-3">
-                <input type="text" class="input-text required rate" data-valid="between:0-30" data-error="" />
+                <input type="text" class="input-text required rate" data-valid="isNonEmpty||onlyNum" data-error="倍率不能为空||必须为数字" />
             </div>
+            <div class="col-2"></div>
         </div>
         <div class="row">
             <label class="form-label col-2"><span class="c-red">*</span>[旧表]位数：</label>
             <div class="formControls col-3">
-                <input type="text" class="input-text required digit" disabled="disabled" data-valid="between:0-30" data-error="" />
+                <select class="input-text digit" style="background-color: #EEEEEE;" disabled="disabled">
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                </select>
             </div>
             <label class="form-label col-2"><span class="c-red">*</span>[新表]位数：</label>
             <div class="formControls col-3">
-                <input type="text" class="input-text required digit" data-valid="between:0-30" data-error="" />
+                <select class="input-text required digit" data-valid="isNonEmpty" data-error="位数不能为空">
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                </select>
             </div>
+            <div class="col-2"></div>
         </div>
         <%--  --%>
         <div class="row">
             <label class="form-label col-2"><span class="c-red">*</span>[旧表]表计类别：</label>
             <div class="formControls col-3">
-                <select class="input-text required meterType" data-valid="isNonEmpty" disabled="disabled" style="background-color: #EEEEEE;" data-error="表计类别不能为空">
+                <select class="input-text meterType" disabled="disabled" style="background-color: #EEEEEE;">
                     <option value="">请选择</option>
                     <option value="wm">水表</option>
                     <option value="am">电表</option>
@@ -421,17 +446,18 @@
             </div>
             <label class="form-label col-2"><span class="c-red">*</span>[新表]表计类别：</label>
             <div class="formControls col-3">
-                <select class="input-text required meterType" data-valid="isNonEmpty" data-error="表计类别不能为空">
+                <select class="input-text required meterType" disabled="disabled" style="background-color: #EEEEEE;" data-valid="isNonEmpty" data-error="表计类别不能为空">
                     <option value="">请选择</option>
                     <option value="wm">水表</option>
                     <option value="am">电表</option>
                 </select>
             </div>
+            <div class="col-2"></div>
         </div>
         <div class="row">
             <label class="form-label col-2"><span class="c-red">*</span>[旧表]大小类别：</label>
             <div class="formControls col-3">
-                <select class="input-text required sizeType" disabled="disabled" style="background-color: #EEEEEE;" data-valid="isNonEmpty" data-error="大小类别不能为空">
+                <select class="input-text sizeType" disabled="disabled" style="background-color: #EEEEEE;">
                     <option value="">请选择</option>
                     <option value="1">大表</option>
                     <option value="2">小表</option>
@@ -445,11 +471,12 @@
                     <option value="2">小表</option>
                 </select>
             </div>
+            <div class="col-2"></div>
         </div>
         <div class="row">
             <label class="form-label col-2"><span class="c-red">*</span>[旧表]性质类别：</label>
             <div class="formControls col-3">
-                <select class="input-text required natureType" data-valid="isNonEmpty" style="background-color: #EEEEEE;" disabled="disabled" data-error="性质类别不能为空">
+                <select class="input-text natureType" style="background-color: #EEEEEE;" disabled="disabled">
                     <option value="">请选择</option>
                     <option value="1">居民用电</option>
                     <option value="2">工业用电</option>
@@ -467,11 +494,12 @@
                     <option value="4">其它用电</option>
                 </select>
             </div>
+            <div class="col-2"></div>
         </div>
         <div class="row">
             <label class="form-label col-2"><span class="c-red">*</span>[旧表]使用类别：</label>
             <div class="formControls col-3">
-                <select class="input-text required useType" data-valid="isNonEmpty" style="background-color: #EEEEEE;" disabled="disabled" data-error="使用类别不能为空">
+                <select class="input-text useType" style="background-color: #EEEEEE;" disabled="disabled">
                     <option value="">请选择</option>
                     <option value="0">公共</option>
                     <option value="1">家用</option>
@@ -489,15 +517,16 @@
                     <option value="3">其他</option>
                 </select>
             </div>
+            <div class="col-2"></div>
         </div>
         <div class="row">
             <label class="form-label col-2"><span class="c-red">*</span>[旧表]表计位置：</label>
             <div class="formControls col-3">
-                <input type="text" class="input-text required addr" disabled="disabled" data-valid="between:0-30" data-error="" />
+                <input type="text" class="input-text addr" disabled="disabled" />
             </div>
             <label class="form-label col-2"><span class="c-red">*</span>[新表]表计位置：</label>
             <div class="formControls col-3">
-                <input type="text" class="input-text required addr" data-valid="between:0-30" data-error="" />
+                <input type="text" class="input-text addr" />
             </div>
         </div>
         <div class="row" style="text-align: center; margin: 20px 0px;">
@@ -713,7 +742,7 @@
                     layer.alert("获取数据失败！");
                 }
             }
-            if (vjson.type = "change") {
+            if (vjson.type == "change") {
                 if (vjson.flag == "1") {
                     var meter = JSON.parse(vjson.data);
                     $("#change .loc1").val(meter.MeterLOCNo1Name);
@@ -722,14 +751,17 @@
                     $("#change .loc4").val(meter.MeterLOCNo4Name);
                     if (meter.MeterRMID) {
                         $("#change .loc5").val(meter.MeterRMID);
+                        $("#change .loc5").parent().parent().show();
                     } else {
                         $("#change .loc5").parent().parent().hide();
                     }
                     $("#change .meterNo").eq(0).val(meter.MeterNo);
                     $("#change .meterName").eq(0).val(meter.MeterName);
                     $("#change .lastRead").val(meter.MeterReadout);
-                    $("#change .rate").val(meter.MeterRate);
-                    $("#change .digit").val(meter.MeterDigit);
+                    $("#change .rate").eq(0).val(meter.MeterRate);
+                    $("#change .digit").eq(0).val(meter.MeterDigit);
+                    $("#change .rate").eq(1).val("").unbind("change").bind("change", writeMeterName);
+                    $("#change .digit").eq(1).val("").unbind("change").bind("change", writeMeterName);
                     $("#change .meterType").val(meter.MeterType);
                     $("#change .sizeType").val(meter.MeterSize);
                     $("#change .natureType").val(meter.MeterNatureType);
@@ -744,8 +776,14 @@
                     console.log(vjson.info);
                 }
             }
-            if (vjson.type = "changesubmit") {
-
+            if (vjson.type == "changesubmit") {
+                if (vjson.flag == "1") {
+                    $("#change").hide();
+                    $("#list").show();
+                    layer.msg("换表成功！");
+                } else {
+                    layer.alert("换表失败！");
+                }
             }
         }
         function view() {
@@ -767,6 +805,8 @@
                 return;
             }
             $('#change').validate('reset');
+            $('#change').validate('init');
+            $('#change input,#change select').val('');
             id = $("#selectKey").val();
             type = "change";
             var submitData = new Object();
@@ -777,7 +817,38 @@
         }
         function changesubmit() {
             if ($('#change').validate('submitValidate')) {
-
+                var submitData = new Object();
+                submitData.Type = "changesubmit";
+                submitData.meterNo = id;
+                submitData.endReadout = $("#change .endRead").eq(0).val();
+                submitData.reading = $("#change .reading").eq(0).val();
+                submitData.newMeterNo = $("#change .meterNo").eq(1).val();
+                submitData.newMeterName = $("#change .meterName").eq(1).val();
+                submitData.newMeterReadout = $("#change .startRead").eq(0).val();
+                submitData.newMeterDigit = $("#change .digit").eq(1).val();
+                submitData.newMeterRate = $("#change .rate").eq(1).val();
+                submitData.newMeterType = $("#change .meterType").eq(1).val();
+                submitData.newMeterSizeType = $("#change .sizeType").eq(1).val();
+                submitData.newMeterNatureType = $("#change .natureType").eq(1).val();
+                submitData.newMeterUseType = $("#change .useType").eq(1).val();
+                submitData.newMeterAddr = $("#change .addr").eq(1).val();
+                //submitData.readout = $("").val();
+                transmitData(datatostr(submitData));
+            }
+            return;
+        }
+        function writeMeterName() {
+            var type = $("#change .meterType").eq(1).find("option:selected").text();;
+            var rate = $("#change .rate").eq(1).val();
+            var digit = $("#change .digit").eq(1).val();
+            var meterName = $("#change .meterName").eq(1);
+            if (rate!=null & rate!="" & !isNaN(rate)) {
+                meterName.val(type + "-" + rate + "倍");
+                if (digit!=null & digit!="" &!isNaN(digit)) {
+                    meterName.val(type + "-" + rate + "倍" + "-" + digit + "位");
+                }
+            } else {
+                meterName.val(type);
             }
         }
         function insert() {
@@ -1114,7 +1185,35 @@
         },
             tiptype = "1");
 
-
+        //度数计算
+        function calcReadout() {
+            if ($("#change .endRead").eq(0).val() != "" && $("#change .lastRead").eq(0).val() != "") {
+                var lastRead = parseFloat($("#change .lastRead").eq(0).val());
+                var endRead = parseFloat($("#change .endRead").eq(0).val());
+                var digit = parseInt($("#change .digit").eq(0).val());
+                var reading = $("#change .reading").eq(0);
+                if (endRead >= lastRead)
+                    reading.val(endRead - lastRead)
+                else {
+                    if (digit == 4)
+                        reading.val(endRead + (9999 - lastRead + 1));
+                    else if (digit == 5)
+                        reading.val(endRead + (99999 - lastRead + 1));
+                    else if (digit == 6)
+                        reading.val(endRead + (999999 - lastRead + 1));
+                    else if (digit == 7)
+                        reading.val(endRead + (9999999 - lastRead + 1));
+                    else if (digit == 8)
+                        reading.val(endRead + (99999999 - lastRead + 1));
+                    else {
+                        reading.val("");
+                    }
+                }
+            }
+            else {
+                reading.val("")
+            }
+        }
         var trid = "";
         reflist();
     </script>

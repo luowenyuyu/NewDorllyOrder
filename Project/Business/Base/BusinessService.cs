@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Data;
+using System.Text;
+
 namespace project.Business.Base
 {
     /// <summary>
@@ -40,13 +42,14 @@ namespace project.Business.Base
         /// </summary>
         public void load(string id)
         {
-            DataRow dr = objdata.PopulateDataSet("select a.*,b.SPShortName as SRVSPName,c.SRVTypeName as SRVTypeNo1Name,d.SRVTypeName as SRVTypeNo2Name,e.CAName,isnull(f.Rate,0) as NewRate " +
+            DataRow dr = objdata.PopulateDataSet(@"select a.*,
+                b.SPShortName as SRVSPName,c.SRVTypeName as SRVTypeNo1Name,
+                d.SRVTypeName as SRVTypeNo2Name " +
                 "from Mstr_Service a " +
                 "left join Mstr_ServiceProvider b on a.SRVSPNo=b.SPNo " +
                 "left join Mstr_ServiceType c on a.SRVTypeNo1=c.SRVTypeNo " +
                 "left join Mstr_ServiceType d on a.SRVTypeNo2=d.SRVTypeNo " +
-                "left join Mstr_ChargeAccount e on a.CANo=e.CANo and a.SRVSPNo=e.CASPNo " +
-                "left join Mstr_TaxRate f on f.SRVNo=a.SRVNo " +
+                "left join Mstr_Formula f on a.SRVFormulaID=f.ID " +
                 "where a.SRVNo='" + id + "'").Tables[0].Rows[0];
             _entity.SRVNo = dr["SRVNo"].ToString();
             _entity.SRVName = dr["SRVName"].ToString();
@@ -55,17 +58,19 @@ namespace project.Business.Base
             _entity.SRVTypeNo2 = dr["SRVTypeNo2"].ToString();
             _entity.SRVTypeNo2Name = dr["SRVTypeNo2Name"].ToString();
             _entity.SRVSPNo = dr["SRVSPNo"].ToString();
-            _entity.CANo = dr["CANo"].ToString();
-            _entity.CAName = dr["CAName"].ToString();
             _entity.SRVSPName = dr["SRVSPName"].ToString();
-            _entity.SRVCalType = dr["SRVCalType"].ToString();
             _entity.SRVRoundType = dr["SRVRoundType"].ToString();
-            _entity.SRVDecimalPoint = ParseIntForString(dr["SRVDecimalPoint"].ToString());
-            _entity.SRVRate = ParseDecimalForString(dr["SRVRate"].ToString());
-            //_entity.SRVTaxRate = ParseDecimalForString(dr["SRVTaxRate"].ToString());
-            _entity.SRVTaxRate = ParseDecimalForString(dr["NewRate"].ToString());
+            _entity.SRVTaxRate = ParseDecimalForString(dr["SRVTaxRate"].ToString());
             _entity.SRVStatus = bool.Parse(dr["SRVStatus"].ToString());
             _entity.SRVRemark = dr["SRVRemark"].ToString();
+            _entity.SRVFormulaID = dr["SRVFormulaID"].ToString();
+            _entity.SRVPrice = ParseDecimalForString(dr["SRVPrice"].ToString());
+            _entity.SRVPriceType = ParseIntForString(dr["SRVPriceType"].ToString());
+            _entity.SRVCalcCycle = ParseIntForString(dr["SRVCalcCycle"].ToString());
+            _entity.SRVFinanceFeeCode = dr["SRVFinanceFeeCode"].ToString();
+            _entity.SRVFinanceFeeName = dr["SRVFinanceFeeName"].ToString();
+            _entity.SRVFinanceReceivableCode = dr["SRVFinanceReceivableCode"].ToString();
+
         }
 
         /// </summary>
@@ -73,22 +78,50 @@ namespace project.Business.Base
         /// </summary>
         public int Save(string type)
         {
-            string sqlstr = "";
+            StringBuilder sqlstr = new StringBuilder();
             if (type == "insert")
-                sqlstr = "insert into Mstr_Service(SRVNo,SRVName,SRVTypeNo1,SRVTypeNo2,SRVSPNo,CANo,SRVCalType,SRVRoundType,SRVDecimalPoint,SRVRate,SRVTaxRate,SRVRemark,SRVStatus)" +
-                    "values('" + Entity.SRVNo + "'" + "," + "'" + Entity.SRVName + "'" + "," + "'" + Entity.SRVTypeNo1 + "'" + "," +
-                    "'" + Entity.SRVTypeNo2 + "'" + "," + "'" + Entity.SRVSPNo + "'" + "," + "'" + Entity.CANo + "'" + "," + 
-                    "'" + Entity.SRVCalType + "'" + "," + "'" + Entity.SRVRoundType + "'" + "," + Entity.SRVDecimalPoint + ","+
-                    Entity.SRVRate + "," + Entity.SRVTaxRate + "," + "'" + Entity.SRVRemark + "'" + "," + "1)";
+            {
+                sqlstr.Append(@"insert into Mstr_Service(SRVNo,SRVName,SRVTypeNo1,SRVTypeNo2,SRVSPNo,
+                                SRVFormulaID,SRVRoundType,SRVTaxRate,SRVPrice,SRVPriceType,SRVCalcCycle,
+                                SRVFinanceFeeCode,SRVFinanceFeeName,SRVFinanceReceivableCode,
+                                SRVRemark,SRVStatus) values(");
+                sqlstr.AppendFormat("'{0}',", Entity.SRVNo);
+                sqlstr.AppendFormat("'{0}',", Entity.SRVName);
+                sqlstr.AppendFormat("'{0}',", Entity.SRVTypeNo1);
+                sqlstr.AppendFormat("'{0}',", Entity.SRVTypeNo2);
+                sqlstr.AppendFormat("'{0}',", Entity.SRVSPNo);
+                sqlstr.AppendFormat("'{0}',", Entity.SRVFormulaID);
+                sqlstr.AppendFormat("'{0}',", Entity.SRVRoundType);
+                sqlstr.AppendFormat("'{0}',", Entity.SRVTaxRate);
+                sqlstr.AppendFormat("'{0}',", Entity.SRVPrice);
+                sqlstr.AppendFormat("'{0}',", Entity.SRVPriceType);
+                sqlstr.AppendFormat("'{0}',", Entity.SRVCalcCycle);
+                sqlstr.AppendFormat("'{0}',", Entity.SRVFinanceFeeCode);
+                sqlstr.AppendFormat("'{0}',", Entity.SRVFinanceFeeName);
+                sqlstr.AppendFormat("'{0}',", Entity.SRVFinanceReceivableCode);
+                sqlstr.AppendFormat("'{0}',", Entity.SRVRemark);
+                sqlstr.AppendFormat("'{0}')", "1");
+            }
             else
-                sqlstr = "update Mstr_Service" +
-                    " set SRVName=" + "'" + Entity.SRVName + "'" + "," + "SRVTypeNo1=" + "'" + Entity.SRVTypeNo1 + "'" + "," +
-                    "SRVTypeNo2=" + "'" + Entity.SRVTypeNo2 + "'" + "," + "SRVSPNo=" + "'" + Entity.SRVSPNo + "'" + "," + "CANo=" + "'" + Entity.CANo + "'" + "," + 
-                    "SRVCalType=" + "'" + Entity.SRVCalType + "'" + "," + "SRVRoundType=" + "'" + Entity.SRVRoundType + "'" + "," + 
-                    "SRVDecimalPoint=" + Entity.SRVDecimalPoint + "," + "SRVRate=" + Entity.SRVRate + "," + 
-                    "SRVTaxRate=" + Entity.SRVTaxRate + "," + "SRVRemark=" + "'" + Entity.SRVRemark + "'" +
-                    " where SRVNo='" + Entity.SRVNo + "'";
-            return objdata.ExecuteNonQuery(sqlstr);
+            {
+                sqlstr.Append("update Mstr_Service Set ");
+                sqlstr.AppendFormat("SRVName='{0}',", Entity.SRVName);
+                sqlstr.AppendFormat("SRVTypeNo1='{0}',", Entity.SRVTypeNo1);
+                sqlstr.AppendFormat("SRVTypeNo2='{0}',", Entity.SRVTypeNo2);
+                sqlstr.AppendFormat("SRVSPNo='{0}',", Entity.SRVSPNo);
+                sqlstr.AppendFormat("SRVFormulaID='{0}',", Entity.SRVFormulaID);
+                sqlstr.AppendFormat("SRVRoundType='{0}',", Entity.SRVRoundType);
+                sqlstr.AppendFormat("SRVTaxRate='{0}',", Entity.SRVTaxRate);
+                sqlstr.AppendFormat("SRVPrice='{0}',", Entity.SRVPrice);
+                sqlstr.AppendFormat("SRVPriceType='{0}',", Entity.SRVPriceType);
+                sqlstr.AppendFormat("SRVCalcCycle='{0}',", Entity.SRVCalcCycle);
+                sqlstr.AppendFormat("SRVFinanceFeeCode='{0}',", Entity.SRVFinanceFeeCode);
+                sqlstr.AppendFormat("SRVFinanceFeeName='{0}',", Entity.SRVFinanceFeeName);
+                sqlstr.AppendFormat("SRVFinanceReceivableCode='{0}',", Entity.SRVFinanceReceivableCode);
+                sqlstr.AppendFormat("SRVRemark='{0}' ", Entity.SRVRemark);
+                sqlstr.AppendFormat("where SRVNo='{0}'", Entity.SRVNo);
+            }
+            return objdata.ExecuteNonQuery(sqlstr.ToString());
         }
 
         /// </summary>
@@ -118,14 +151,14 @@ namespace project.Business.Base
         /// <param name="CANo">收费科目</param>
         /// <param name="SRVCalType">收费方式</param>
         /// <returns></returns>
-        public System.Collections.ICollection GetListQuery(string SRVNo, string SRVName, string SRVTypeNo1, string SRVTypeNo2, string SRVSPNo, string CANo, string SRVCalType, int startRow, int pageSize)
+        public System.Collections.ICollection GetListQuery(string SRVNo, string SRVName, string SRVTypeNo1, string SRVTypeNo2, string SRVSPNo, int startRow, int pageSize)
         {
             if (startRow < 0 || pageSize <= 0)
             {
                 throw new Exception();
             }
 
-            return GetListHelper(SRVNo, SRVName, SRVTypeNo1, SRVTypeNo2, SRVSPNo, CANo, SRVCalType, startRow, pageSize);
+            return GetListHelper(SRVNo, SRVName, SRVTypeNo1, SRVTypeNo2, SRVSPNo, startRow, pageSize);
         }
 
         /// <summary>
@@ -139,9 +172,9 @@ namespace project.Business.Base
         /// <param name="CANo">收费科目</param>
         /// <param name="SRVCalType">收费方式</param>
         /// <returns></returns>
-        public System.Collections.ICollection GetListQuery(string SRVNo, string SRVName, string SRVTypeNo1, string SRVTypeNo2, string SRVSPNo, string CANo, string SRVCalType)
+        public System.Collections.ICollection GetListQuery(string SRVNo, string SRVName, string SRVTypeNo1, string SRVTypeNo2, string SRVSPNo)
         {
-            return GetListHelper(SRVNo, SRVName, SRVTypeNo1, SRVTypeNo2, SRVSPNo, CANo, SRVCalType, START_ROW_INIT, START_ROW_INIT);
+            return GetListHelper(SRVNo, SRVName, SRVTypeNo1, SRVTypeNo2, SRVSPNo, START_ROW_INIT, START_ROW_INIT);
         }
 
         /// <summary>
@@ -155,7 +188,7 @@ namespace project.Business.Base
         /// <param name="CANo">收费科目</param>
         /// <param name="SRVCalType">收费方式</param>
         /// <returns></returns>
-        public int GetListCount(string SRVNo, string SRVName, string SRVTypeNo1, string SRVTypeNo2, string SRVSPNo, string SRVCalType, string CANo)
+        public int GetListCount(string SRVNo, string SRVName, string SRVTypeNo1, string SRVTypeNo2, string SRVSPNo)
         {
             string wherestr = "";
             if (SRVNo != string.Empty)
@@ -178,14 +211,6 @@ namespace project.Business.Base
             {
                 wherestr = wherestr + " and SRVSPNo = '" + SRVSPNo + "'";
             }
-            if (CANo != string.Empty)
-            {
-                wherestr = wherestr + " and CANo = '" + CANo + "'";
-            }
-            if (SRVCalType != string.Empty)
-            {
-                wherestr = wherestr + " and SRVCalType = '" + SRVCalType + "'";
-            }
 
             string count = objdata.PopulateDataSet("select count(*) as cnt from Mstr_Service where 1=1 " + wherestr).Tables[0].Rows[0]["cnt"].ToString();
             return int.Parse(count);
@@ -202,7 +227,7 @@ namespace project.Business.Base
         /// <param name="CANo">收费科目</param>
         /// <param name="SRVCalType">收费方式</param>
         /// <returns></returns>
-        private System.Collections.ICollection GetListHelper(string SRVNo, string SRVName, string SRVTypeNo1, string SRVTypeNo2, string SRVSPNo, string CANo, string SRVCalType, int startRow, int pageSize)
+        private System.Collections.ICollection GetListHelper(string SRVNo, string SRVName, string SRVTypeNo1, string SRVTypeNo2, string SRVSPNo, int startRow, int pageSize)
         {
             string wherestr = "";
             if (SRVNo != string.Empty)
@@ -225,27 +250,30 @@ namespace project.Business.Base
             {
                 wherestr = wherestr + " and a.SRVSPNo = '" + SRVSPNo + "'";
             }
-            if (CANo != string.Empty)
-            {
-                wherestr = wherestr + " and a.CANo = '" + CANo + "'";
-            }
-            if (SRVCalType != string.Empty)
-            {
-                wherestr = wherestr + " and a.SRVCalType = '" + SRVCalType + "'";
-            }
-
             System.Collections.IList entitys = null;
             if (startRow > START_ROW_INIT && pageSize > START_ROW_INIT)
             {
-                entitys = Query(objdata.ExecSelect("Mstr_Service a left join Mstr_ServiceProvider b on a.SRVSPNo=b.SPNo left join Mstr_ServiceType c on a.SRVTypeNo1=c.SRVTypeNo "+
-                    "left join Mstr_ServiceType d on a.SRVTypeNo2=d.SRVTypeNo left join Mstr_ChargeAccount e on a.CANo=e.CANo and a.SRVSPNo=e.CASPNo ",
-                    "a.*,b.SPShortName as SRVSPName,c.SRVTypeName as SRVTypeNo1Name,d.SRVTypeName as SRVTypeNo2Name,e.CAName", wherestr, startRow, pageSize, OrderField));
+                //entitys = Query(objdata.ExecSelect("Mstr_Service a left join Mstr_ServiceProvider b on a.SRVSPNo=b.SPNo left join Mstr_ServiceType c on a.SRVTypeNo1=c.SRVTypeNo " +
+                //    "left join Mstr_ServiceType d on a.SRVTypeNo2=d.SRVTypeNo left join Mstr_ChargeAccount e on a.CANo=e.CANo and a.SRVSPNo=e.CASPNo ",
+                //    "a.*,b.SPShortName as SRVSPName,c.SRVTypeName as SRVTypeNo1Name,d.SRVTypeName as SRVTypeNo2Name,e.CAName", wherestr, startRow, pageSize, OrderField));
+                entitys = Query(objdata.ExecSelect(@"Mstr_Service a 
+                                                    left join Mstr_ServiceProvider b on a.SRVSPNo=b.SPNo 
+                                                    left join Mstr_ServiceType c on a.SRVTypeNo1=c.SRVTypeNo 
+                                                    left join Mstr_ServiceType d on a.SRVTypeNo2=d.SRVTypeNo",
+                                                    "a.*,b.SPShortName as SRVSPName,c.SRVTypeName as SRVTypeNo1Name,d.SRVTypeName as SRVTypeNo2Name",
+                                                    wherestr, startRow, pageSize, OrderField));
             }
             else
             {
-                entitys = Query(objdata.ExecSelect("Mstr_Service a left join Mstr_ServiceProvider b on a.SRVSPNo=b.SPNo left join Mstr_ServiceType c on a.SRVTypeNo1=c.SRVTypeNo "+
-                    "left join Mstr_ServiceType d on a.SRVTypeNo2=d.SRVTypeNo left join Mstr_ChargeAccount e on a.CANo=e.CANo and a.SRVSPNo=e.CASPNo ",
-                    "a.*,b.SPShortName as SRVSPName,c.SRVTypeName as SRVTypeNo1Name,d.SRVTypeName as SRVTypeNo2Name,e.CAName", wherestr, START_ROW_INIT, START_ROW_INIT, OrderField));
+                //entitys = Query(objdata.ExecSelect("Mstr_Service a left join Mstr_ServiceProvider b on a.SRVSPNo=b.SPNo left join Mstr_ServiceType c on a.SRVTypeNo1=c.SRVTypeNo " +
+                //    "left join Mstr_ServiceType d on a.SRVTypeNo2=d.SRVTypeNo left join Mstr_ChargeAccount e on a.CANo=e.CANo and a.SRVSPNo=e.CASPNo ",
+                //    "a.*,b.SPShortName as SRVSPName,c.SRVTypeName as SRVTypeNo1Name,d.SRVTypeName as SRVTypeNo2Name,e.CAName", wherestr, START_ROW_INIT, START_ROW_INIT, OrderField));
+                entitys = Query(objdata.ExecSelect(@"Mstr_Service a 
+                                                    left join Mstr_ServiceProvider b on a.SRVSPNo=b.SPNo 
+                                                    left join Mstr_ServiceType c on a.SRVTypeNo1=c.SRVTypeNo 
+                                                    left join Mstr_ServiceType d on a.SRVTypeNo2=d.SRVTypeNo",
+                                                    "a.*,b.SPShortName as SRVSPName,c.SRVTypeName as SRVTypeNo1Name,d.SRVTypeName as SRVTypeNo2Name",
+                                                    wherestr, START_ROW_INIT, START_ROW_INIT, OrderField));
             }
             return entitys;
         }
@@ -267,15 +295,18 @@ namespace project.Business.Base
                 entity.SRVTypeNo2Name = dr["SRVTypeNo2Name"].ToString();
                 entity.SRVSPNo = dr["SRVSPNo"].ToString();
                 entity.SRVSPName = dr["SRVSPName"].ToString();
-                entity.CANo = dr["CANo"].ToString();
-                entity.CAName = dr["CAName"].ToString();
-                entity.SRVCalType = dr["SRVCalType"].ToString();
                 entity.SRVRoundType = dr["SRVRoundType"].ToString();
-                entity.SRVDecimalPoint = ParseIntForString(dr["SRVDecimalPoint"].ToString());
-                entity.SRVRate = ParseDecimalForString(dr["SRVRate"].ToString());
                 entity.SRVTaxRate = ParseDecimalForString(dr["SRVTaxRate"].ToString());
                 entity.SRVStatus = bool.Parse(dr["SRVStatus"].ToString());
                 entity.SRVRemark = dr["SRVRemark"].ToString();
+                entity.SRVFormulaID = dr["SRVFormulaID"].ToString();
+                entity.SRVPrice = ParseDecimalForString(dr["SRVPrice"].ToString());
+                entity.SRVPriceType = ParseIntForString(dr["SRVPriceType"].ToString());
+                entity.SRVCalcCycle = ParseIntForString(dr["SRVCalcCycle"].ToString());
+                entity.SRVFinanceFeeCode = dr["SRVFinanceFeeCode"].ToString();
+                entity.SRVFinanceFeeName = dr["SRVFinanceFeeName"].ToString();
+                entity.SRVFinanceReceivableCode = dr["SRVFinanceReceivableCode"].ToString();
+
                 result.Add(entity);
             }
             return result;

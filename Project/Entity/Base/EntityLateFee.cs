@@ -112,5 +112,13 @@ namespace project.Entity.Base
             get { return _UpdateDate; }
             set { _UpdateDate = value; }
         }
+        /// <summary>
+        /// 服务商编号
+        /// </summary>
+        public string SPNo { get; set; }
+        /// <summary>
+        /// 服务商简称
+        /// </summary>
+        public string SPShortName { get; set; }
     }
 }

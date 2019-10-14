@@ -103,6 +103,9 @@ namespace project.Entity.Op
             set { _FeeEndDate = value; }
         }
 
+        public decimal FeeQty { get; set; }
+        public decimal FeeUnitPrice { get; set; }
+
         /// <summary>
         /// 功能描述：金额
         /// </summary>

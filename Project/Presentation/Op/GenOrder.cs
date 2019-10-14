@@ -302,19 +302,28 @@ namespace project.Presentation.Op
             try
             {
                 con = Data.Conn();
-                command = new SqlCommand("GenOrderFromContract", con);
+                //command = new SqlCommand("GenOrderFromContract", con);
+                command = new SqlCommand("Contract_GenOrder", con);
                 command.CommandType = CommandType.StoredProcedure;
 
                 command.Parameters.Add("@TableName", SqlDbType.NVarChar, 36).Value = TableName;
                 command.Parameters.Add("@UserName", SqlDbType.NVarChar, 30).Value = UserName;
-                command.Parameters.Add("@InfoMsg", SqlDbType.NVarChar, 500).Direction = ParameterDirection.Output;
+                command.Parameters.Add("@Msg", SqlDbType.NVarChar, 500).Direction = ParameterDirection.Output;
                 con.Open();
                 command.ExecuteNonQuery();
-                InfoMsg = command.Parameters["@InfoMsg"].Value.ToString();
+                InfoMsg = command.Parameters["@Msg"].Value.ToString();
             }
             catch (Exception ex)
             {
                 InfoMsg = ex.ToString();
+                string sql = string.Format("DROP TABLE {0}", TableName);
+                command = new SqlCommand(sql, con);
+                if (con.State == ConnectionState.Closed) con.Open();
+                try
+                {
+                    command.ExecuteNonQuery();
+                }
+                catch {}
             }
             finally
             {

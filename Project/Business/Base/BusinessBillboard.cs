@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
+using System.Configuration;
 using System.Data;
 namespace project.Business.Base
 {
@@ -303,5 +305,39 @@ namespace project.Business.Base
             }
             return result;
         }
+
+        #region 资源同步
+        /// <summary>
+        /// 工位资源同步
+        /// </summary>
+        /// <param name="model">au=>add or update(添加或修改);del=>删除</param>
+        /// <returns></returns>
+        public string SyncResource(string model)
+        {
+            string result = string.Empty;
+            if (ConfigurationManager.AppSettings["IsPutZY"].ToString().Equals("Y"))
+            {
+                try
+                {
+                    ResourceService.ResourceService srv = new ResourceService.ResourceService
+                    {
+                        Timeout = 5000,
+                        Url = ConfigurationManager.AppSettings["ResourceUrl"].ToString()
+                    };
+                    if (model.Equals("au"))
+                        result = srv.AddOrUpdateBillboard(JsonConvert.SerializeObject(Entity));
+                    else
+                        result = srv.DeleteResource(Entity.BBNo);
+                }
+                catch (Exception ex)
+                {
+                    result = ex.ToString();
+                }
+            }
+            else result = "已配置不同步";
+            return result;
+        }
+
+        #endregion
     }
 }

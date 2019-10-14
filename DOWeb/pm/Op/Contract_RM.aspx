@@ -345,7 +345,7 @@
 
                     $("#ContractNo").val("");
                     $("#ContractType").val("01");
-                    $("#ContractSPNo").val("<%=RMSPNo %>");
+                    $("#ContractSPNo").val("");
                     $("#ContractSPName").val("");
                     $("#ContractCustNo").val("");
                     $("#ContractCustName").val("");
@@ -456,12 +456,12 @@
                     if (vjson.status == "1") {
                         $("#" + vjson.id + " td").eq(7).html("<label style=\"color:red;\">制单</label>");
                         layer.alert("取消审核成功！");
-                        console.log(vjson.sync);
+                        console.log(vjson.ZYSync);
                     }
                     else {
                         $("#" + vjson.id + " td").eq(7).html("<label style=\"color:blue;\">已审核</label>");
                         layer.alert("审核成功！");
-                        console.log(vjson.sync);
+                        console.log(vjson.ZYSync);
                     }
                 }
                 else if (vjson.flag == "3") {
@@ -1320,9 +1320,9 @@
             itemid1 = "";
 
             $("#RMID").val("");
-            $("#SRVNo1").val("<%=RMRentSRVNo %>");
+            $("#SRVNo1").val("");
             $("#RMArea").val("");
-            $("#RentalUnitPrice").val("<%=RMRentFee %>");
+            $("#RentalUnitPrice").val("");
             $("#RMLoc").val("");
             $("#Remark1").val("");
             $("#IsFixedAmt").prop("checked", false);
@@ -1546,6 +1546,10 @@
             var MaxOffLeaseActulDate = new JsInputDate("MaxOffLeaseActulDate");
             MaxOffLeaseActulDate.setDisabled(false);
             MaxOffLeaseActulDate.setWidth("100px");
+
+            $("#SRVNo1").change(function () {
+                $("#RentalUnitPrice").val($("#SRVNo1 option:selected").attr("data-price"));                
+            });
         });
 
         var id = "";

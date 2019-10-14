@@ -298,7 +298,10 @@
                     <td class="tdr1">
                         <input type="text" id="BBName" disabled="disabled" class="input-text size-MINI" /></td>
                     <td class="tdl1">所属服务项目</td>
-                    <td class="tdr1"><%=SRVNo3Str %></td>
+                    <td class="tdr1">
+                        <select class="input-text size-MINI" id="SRVNo3" data-provider="">
+                        </select>
+                    </td>
                 </tr>
                 <tr>
                     <td class="tdl1">开始投放日期</td>
@@ -411,7 +414,7 @@
 
                     $("#ContractNo").val("");
                     $("#ContractType").val("03");
-                    $("#ContractSPNo").val("<%=BBSPNo %>");
+                    $("#ContractSPNo").val("");
                     $("#ContractSPName").val("");
                     $("#ContractCustNo").val("");
                     $("#ContractCustName").val("");
@@ -521,12 +524,12 @@
                     if (vjson.status == "1") {
                         $("#" + vjson.id + " td").eq(7).html("<label style=\"color:red;\">制单</label>");
                         layer.alert("取消审核成功！");
-                        console.log(vjson.sync);
+                        console.log(vjson.ZYSync);
                     }
                     else {
                         $("#" + vjson.id + " td").eq(7).html("<label style=\"color:blue;\">已审核</label>");
                         layer.alert("审核成功！");
-                        console.log(vjson.sync);
+                        console.log(vjson.ZYSync);
                     }
                 }
                 else if (vjson.flag == "3") {
@@ -911,6 +914,10 @@
                 else {
                     layer.alert("获取数据出错！");
                 }
+                return;
+            }
+            if (vjson.type == "getFeeSubject") {
+                $("#SRVNo3").empty().append(vjson.result);
                 return;
             }
         }
@@ -1427,7 +1434,7 @@
             itemtp3 = "insert";
             itemid3 = "";
 
-            $("#SRVNo3").val("<%=BBRentSRVNo %>");
+            $("#SRVNo3").val("");
             $("#BBNo").val("");
             $("#BBName").val("");
             $("#BBSize").val("");
@@ -1534,10 +1541,22 @@
                 if (page == "4") {
                     $('#itemtab4').addClass("selected");
                     $("#bodyeditdiv3").show();
+                    if ($("#SRVNo3").attr("data-provider") != $("#ContractSPNo").val()) {
+                        $("#SRVNo3").attr("data-provider", $("#ContractSPNo").val());
+                        getFeeSubject();
+                    }
                 }
             }
         }
-
+        function getFeeSubject() {
+            var submitData = new Object();
+            submitData.Type = "getFeeSubject";
+            submitData.SPNo = $("#ContractSPNo").val();
+            transmitData(datatostr(submitData));
+        }
+        $("#SRVNo3").change(function () {
+            $("#RentalUnitPrice3").val($("#SRVNo3 option:selected").attr("data-price")).trigger("change");
+        });
         $("#ContractCustImg").click(function () {
             ChooseBasic("ContractCustNo", "Cust");
         });

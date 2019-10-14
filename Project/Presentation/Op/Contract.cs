@@ -70,7 +70,7 @@ namespace project.Presentation.Op
                         SRVNo3Str = "<select class=\"input-text size-MINI\" id=\"SRVNo3\">";
                         SRVNo3Str += "<option value=\"\"></option>";
                         Business.Base.BusinessService bc2 = new project.Business.Base.BusinessService();
-                        foreach (Entity.Base.EntityService it in bc2.GetListQuery(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty))
+                        foreach (Entity.Base.EntityService it in bc2.GetListQuery(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty))
                         {
                             SRVNo1Str += "<option value='" + it.SRVNo + "'>" + it.SRVName + "</option>";
                             SRVNo2Str += "<option value='" + it.SRVNo + "'>" + it.SRVName + "</option>";
@@ -1033,7 +1033,7 @@ namespace project.Presentation.Op
                     if (bc.Entity.ContractStatus == "1")
                     {
                         bc.Entity.ContractStatus = "2";
-                        string InfoBar = bc.approve(user.Entity.UserName);
+                        string InfoBar = bc.ContractReview("", bc.Entity.RowPointer, user.Entity.UserName);
                         if (InfoBar != "")
                         {
                             flag = "5";

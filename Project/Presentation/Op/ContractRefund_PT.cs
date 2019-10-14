@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Net.Json;
@@ -438,33 +439,23 @@ namespace project.Presentation.Op
                 }
                 else
                 {
-                    string InfoBar = refund(jp.getValue("id"), jp.getValue("RefundDate"), user.Entity.UserName);
-                    if (InfoBar != "")
+                    string msg = bc.ContractExit(bc.Entity.RowPointer, user.Entity.UserName, jp.getValue("RefundDate"));
+                    if (string.IsNullOrEmpty(msg))
                     {
-                        flag = "4";
-                        collection.Add(new JsonStringValue("InfoBar", InfoBar));
-                    }
-                    else
-                    {
+                        //成功
                         collection.Add(new JsonStringValue("liststr", createList(jp.getValue("ContractNoS"), jp.getValue("ContractNoManualS"), jp.getValue("ContractTypeS"),
                                 jp.getValue("ContractSPNoS"), jp.getValue("ContractCustNoS"), jp.getValue("MinContractSignedDate"), jp.getValue("MaxContractSignedDate"),
                                 jp.getValue("MinContractEndDate"), jp.getValue("MaxContractEndDate"), jp.getValue("OffLeaseStatusS"), jp.getValue("MinOffLeaseActulDate"),
                                 jp.getValue("MaxOffLeaseActulDate"), ParseIntForString(jp.getValue("page")))));
 
-                        #region 同步到管家
-                        try
-                        {
-                            string status = string.Empty;
-                            string date = string.Empty;
-                            bc.CheckCustStatus(out status, out date);
-                            ButlerSrv.AppService appService = new ButlerSrv.AppService { Timeout = 5000 };
-                            appService.UpdateCustomer(bc.Entity.ContractCustNo, status, date);
-                        }
-                        catch (Exception ex)
-                        {
-                            collection.Add(new JsonStringValue("syncButlerException", ex.ToString()));
-                        }
-                        #endregion
+                        collection.Add(new JsonStringValue("GJSync", bc.SyncButlerForCustStatus()));//同步到管家
+                    }
+                    else
+                    {
+                        //失败
+                        flag = "4";
+                        collection.Add(new JsonStringValue("InfoBar", msg));
+
                     }
                 }
             }

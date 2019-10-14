@@ -82,7 +82,7 @@ namespace project.Presentation.Op
                         SRVNo5Str = "<select class=\"input-text size-MINI\" id=\"SRVNo5\">";
                         SRVNo5Str += "<option value=\"\"></option>";
                         Business.Base.BusinessService bc2 = new project.Business.Base.BusinessService();
-                        foreach (Entity.Base.EntityService it in bc2.GetListQuery(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty))
+                        foreach (Entity.Base.EntityService it in bc2.GetListQuery(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty))
                         {
                             SRVNo1Str += "<option value='" + it.SRVNo + "'>" + it.SRVName + "</option>";
                             SRVNo2Str += "<option value='" + it.SRVNo + "'>" + it.SRVName + "</option>";

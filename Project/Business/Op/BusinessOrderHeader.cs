@@ -111,14 +111,14 @@ namespace project.Business.Op
             try
             {
                 con = Data.Conn();
-                command = new SqlCommand("DeleteOrder", con);
+                command = new SqlCommand("OrderDelete", con);
                 command.CommandType = CommandType.StoredProcedure;
 
                 command.Parameters.Add("@OrderID", SqlDbType.NVarChar, 36).Value = Entity.RowPointer;
-                command.Parameters.Add("@InfoMsg", SqlDbType.NVarChar, 500).Direction = ParameterDirection.Output;
+                command.Parameters.Add("@Msg", SqlDbType.NVarChar, 500).Direction = ParameterDirection.Output;
                 con.Open();
                 command.ExecuteNonQuery();
-                InfoMsg = command.Parameters["@InfoMsg"].Value.ToString();
+                InfoMsg = command.Parameters["@Msg"].Value.ToString();
 
             }
             catch (Exception ex)

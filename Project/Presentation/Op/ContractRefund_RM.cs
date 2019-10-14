@@ -353,75 +353,23 @@ namespace project.Presentation.Op
                 }
                 else
                 {
-                    //string InfoBar = refund(jp.getValue("id"), jp.getValue("RefundDate"), user.Entity.UserName);
-                    string InfoBar = bc.ConfirmLeaveWithNoFee(leaveDate);
-                    if (InfoBar != "")
+                    string msg = bc.ContractExit(bc.Entity.RowPointer, user.Entity.UserName, jp.getValue("RefundDate"));
+                    if (string.IsNullOrEmpty(msg))
                     {
-                        collection.Add(new JsonStringValue("InfoBar", InfoBar));
-                        flag = "4";
-                    }
-                    else
-                    {
+                        //成功
                         collection.Add(new JsonStringValue("liststr", createList(jp.getValue("ContractNoS"), jp.getValue("ContractNoManualS"), jp.getValue("ContractTypeS"),
                                 jp.getValue("ContractSPNoS"), jp.getValue("ContractCustNoS"), jp.getValue("MinContractSignedDate"), jp.getValue("MaxContractSignedDate"),
                                 jp.getValue("MinContractEn dDate"), jp.getValue("MaxContractEndDate"), jp.getValue("OffLeaseStatusS"), jp.getValue("MinOffLeaseActulDate"),
                                 jp.getValue("MaxOffLeaseActulDate"), ParseIntForString(jp.getValue("page")))));
 
-                        #region 同步到管家
-                        try
-                        {
-                            string status = string.Empty;
-                            string date = string.Empty;
-                            bc.CheckCustStatus(out status, out date);
-                            ButlerSrv.AppService appService = new ButlerSrv.AppService { Timeout = 5000 };
-                            appService.UpdateCustomer(bc.Entity.ContractCustNo, status, date);
-                        }
-                        catch (Exception ex)
-                        {
-                            collection.Add(new JsonStringValue("syncButlerException", ex.ToString()));
-                        }
-                        #endregion
-
-                        #region 同步到资源系统
-                        string syncResult = string.Empty;
-                        try
-                        {
-
-                            ResourceService.ResourceService srv = new ResourceService.ResourceService
-                            {
-                                Timeout = 5000,
-                                Url = ConfigurationManager.AppSettings["ResourceServiceUrl"].ToString()
-                            };
-                            string Items = "";
-                            Business.Base.BusinessCustomer cust = new Business.Base.BusinessCustomer();
-                            cust.load(bc.Entity.ContractCustNo);
-                            var dt = obj.PopulateDataSet("SELECT RMID FROM Op_ContractRMRentalDetail WHERE RefRP='" + bc.Entity.RowPointer + "' GROUP BY RMID").Tables[0];
-                            foreach (DataRow dr in dt.Rows)
-                            {
-                                SycnResourceStatus rs = new SycnResourceStatus();
-                                rs.SysID = 1;
-                                rs.ResourceID = dr["RMID"].ToString();
-                                rs.BusinessID = bc.Entity.RowPointer;
-                                rs.BusinessNo = bc.Entity.ContractNo;
-                                rs.BusinessType = 1;
-                                rs.RentBeginTime = bc.Entity.FeeStartDate;
-                                rs.RentEndTime = leaveDate;
-                                rs.Status = 2;
-                                rs.RentType = 1;
-                                rs.UpdateTime = GetDate();
-                                rs.UpdateUser = user.Entity.UserName;
-
-                                Items += (Items == "" ? "" : ",") + JsonConvert.SerializeObject(rs);
-                            }
-                            syncResult = srv.LeaseOut("[" + Items + "]");
-                        }
-                        catch (Exception ex)
-                        {
-                            syncResult = ex.ToString();
-                        }
-                        collection.Add(new JsonStringValue("sync", syncResult));
-
-                        #endregion
+                        collection.Add(new JsonStringValue("GJSync", bc.SyncButlerForCustStatus()));//同步到管家
+                        collection.Add(new JsonStringValue("ZYSync", bc.SyncResource("rm", 1, "out", user.Entity.UserName, leaveDate)));//同步到资源
+                    }
+                    else
+                    {
+                        //失败
+                        flag = "4";
+                        collection.Add(new JsonStringValue("InfoBar", msg));
                     }
                 }
             }

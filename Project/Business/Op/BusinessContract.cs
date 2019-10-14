@@ -1,4 +1,8 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using project.Presentation;
+using System;
+using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 namespace project.Business.Op
@@ -221,10 +225,14 @@ namespace project.Business.Op
             return objdata.ExecuteNonQuery("delete from Op_Contract where RowPointer='" + Entity.RowPointer + "'");
         }
 
+        /// <summary>
+        /// 合同审核
         /// </summary>
-        ///Audit方法 
-        /// </summary>
-        public string approve(string UserName)
+        /// <param name="procedureName">存储过程名称</param>
+        /// <param name="contractID">合同主键</param>
+        /// <param name="userName">用户名称</param>
+        /// <returns>如果返回为空则成功，不为空则为失败</returns>
+        public string ContractReview(string procedureName, string contractID, string userName)
         {
 
             string InfoMsg = "";
@@ -233,15 +241,14 @@ namespace project.Business.Op
             try
             {
                 con = Data.Conn();
-                command = new SqlCommand("ApproveContract", con);
+                command = new SqlCommand(procedureName, con);
                 command.CommandType = CommandType.StoredProcedure;
-
-                command.Parameters.Add("@ContractID", SqlDbType.NVarChar, 36).Value = Entity.RowPointer;
-                command.Parameters.Add("@UserName", SqlDbType.NVarChar, 30).Value = UserName;
-                command.Parameters.Add("@InfoMsg", SqlDbType.NVarChar, 500).Direction = ParameterDirection.Output;
+                command.Parameters.Add("@ContractID", SqlDbType.NVarChar, 36).Value = contractID;
+                command.Parameters.Add("@UserName", SqlDbType.NVarChar, 30).Value = userName;
+                command.Parameters.Add("@Msg", SqlDbType.NVarChar, 500).Direction = ParameterDirection.Output;
                 con.Open();
                 command.ExecuteNonQuery();
-                InfoMsg = command.Parameters["@InfoMsg"].Value.ToString();
+                InfoMsg = command.Parameters["@Msg"].Value.ToString();
 
             }
             catch (Exception ex)
@@ -257,6 +264,85 @@ namespace project.Business.Op
             }
             return InfoMsg;
         }
+        /// <summary>
+        /// 合同退租
+        /// </summary>
+        /// <param name="contractID">合同主键</param>
+        /// <param name="userName">用户名称</param>
+        /// <param name="exitDate">退租时间,例:2019-09-01</param>
+        /// <returns></returns>
+        public string ContractExit(string contractID, string userName, string exitDate)
+        {
+            string InfoMsg = "";
+            SqlConnection con = null;
+            SqlCommand command = null;
+            try
+            {
+                con = Data.Conn();
+                command = new SqlCommand("Contract_Exit", con);
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.Add("@ContractID", SqlDbType.NVarChar, 36).Value = contractID;
+                command.Parameters.Add("@UserName", SqlDbType.NVarChar, 30).Value = userName;
+                command.Parameters.Add("@EndDate", SqlDbType.NVarChar, 10).Value = exitDate;
+                command.Parameters.Add("@Msg", SqlDbType.NVarChar, 500).Direction = ParameterDirection.Output;
+                con.Open();
+                command.ExecuteNonQuery();
+                InfoMsg = command.Parameters["@Msg"].Value.ToString();
+
+            }
+            catch (Exception ex)
+            {
+                InfoMsg = ex.ToString();
+            }
+            finally
+            {
+                if (command != null)
+                    command.Dispose();
+                if (con != null)
+                    con.Dispose();
+            }
+            return InfoMsg;
+        }
+
+        /// <summary>
+        /// 合同取消审核
+        /// </summary>
+        /// <param name="contractID">合同主键</param>
+        /// <param name="userName">用户名称</param>
+        /// <returns></returns>
+        public string ContractCancel(string contractID, string userName)
+        {
+            string InfoMsg = "";
+            SqlConnection con = null;
+            SqlCommand command = null;
+            try
+            {
+                con = Data.Conn();
+                command = new SqlCommand("Contract_Cancel", con);
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.Add("@ContractID", SqlDbType.NVarChar, 36).Value = contractID;
+                command.Parameters.Add("@UserName", SqlDbType.NVarChar, 30).Value = userName;
+                command.Parameters.Add("@Msg", SqlDbType.NVarChar, 500).Direction = ParameterDirection.Output;
+                con.Open();
+                command.ExecuteNonQuery();
+                InfoMsg = command.Parameters["@Msg"].Value.ToString();
+
+            }
+            catch (Exception ex)
+            {
+                InfoMsg = ex.ToString();
+            }
+            finally
+            {
+                if (command != null)
+                    command.Dispose();
+                if (con != null)
+                    con.Dispose();
+            }
+            return InfoMsg;
+        }
+
+        #region 合同审核部分，目前已作废
 
         /// </summary>
         /// Audit方法（房屋租赁合同） 
@@ -444,6 +530,8 @@ namespace project.Business.Op
         }
 
 
+        #endregion
+
         /// </summary>
         /// invalid方法 
         /// </summary>
@@ -454,120 +542,7 @@ namespace project.Business.Op
                 "where RowPointer='" + Entity.RowPointer + "'");
         }
 
-        /// <summary>
-        /// 没有涉及到费用计算的退租
-        /// </summary>
-        /// <param name="leaveDate"></param>
-        /// <returns></returns>
-        public string ConfirmLeaveWithNoFee(DateTime leaveDate)
-        {
-            string info = string.Empty;
-            SqlConnection con = null;
-            SqlCommand command = null;
-            try
-            {
-                con = Data.Conn();
-                command = new SqlCommand("Contract_ConfirmLeaveWithNoFee", con);
-                command.CommandType = CommandType.StoredProcedure;
-                command.Parameters.Add("@ContractID", SqlDbType.NVarChar, 50).Value = Entity.RowPointer;
-                command.Parameters.Add("@LeaveDate", SqlDbType.DateTime).Value = leaveDate;
-                command.Parameters.Add("@InfoMsg", SqlDbType.NVarChar, 50).Direction = ParameterDirection.Output;
-                con.Open();
-                command.ExecuteNonQuery();
-                info = command.Parameters["@InfoMsg"].Value.ToString();
 
-            }
-            catch (Exception ex)
-            {
-                info = ex.ToString();
-            }
-            finally
-            {
-                if (command != null)
-                    command.Dispose();
-                if (con != null)
-                    con.Dispose();
-            }
-            return info;
-        }
-        /// <summary>
-        /// 取消审核
-        /// </summary>
-        /// <param name="auditor"></param>
-        /// <returns></returns>
-        public string CancelAudit(string auditor)
-        {
-            string info = string.Empty;
-            SqlConnection con = null;
-            SqlCommand command = null;
-            try
-            {
-                con = Data.Conn();
-                command = new SqlCommand("Contract_CancleAudit", con);
-                command.CommandType = CommandType.StoredProcedure;
-                command.Parameters.Add("@ContractID", SqlDbType.NVarChar, 50).Value = Entity.RowPointer;
-                command.Parameters.Add("@Auditor", SqlDbType.NVarChar, 50).Value = auditor;
-                command.Parameters.Add("@InfoMsg", SqlDbType.NVarChar, 50).Direction = ParameterDirection.Output;
-                con.Open();
-                command.ExecuteNonQuery();
-                info = command.Parameters["@InfoMsg"].Value.ToString();
-
-            }
-            catch (Exception ex)
-            {
-                info = ex.ToString();
-            }
-            finally
-            {
-                if (command != null)
-                    command.Dispose();
-                if (con != null)
-                    con.Dispose();
-            }
-            return info;
-        }
-        
-        public void CheckCustStatus(out string status,out string date)
-        {
-            SqlConnection con = null;
-            SqlCommand command = null;
-            try
-            {
-                con = Data.Conn();
-                command = new SqlCommand("CheckCustStatus", con);
-                command.CommandType = CommandType.StoredProcedure;
-                command.Parameters.Add("@CustNo", SqlDbType.NVarChar, 50).Value = Entity.ContractCustNo;
-                command.Parameters.Add("@Status", SqlDbType.Char, 1).Value = ParameterDirection.Output;
-                command.Parameters.Add("@Date", SqlDbType.Char, 100).Direction = ParameterDirection.Output;
-                con.Open();
-                command.ExecuteNonQuery();
-                status = command.Parameters["@Status"].Value.ToString();
-                date = command.Parameters["@Date"].Value.ToString();
-            }
-            catch (Exception)
-            {
-                status = "";
-                date = "";
-            }
-            finally
-            {
-                if (command != null)
-                    command.Dispose();
-                if (con != null)
-                    con.Dispose();
-            }
-        }
-        public void SyncCustForRefund()
-        {
-            var dt = objdata.PopulateDataSet(string.Format("select 1 from Op_Contract where ContractStatus='2' and ContractCustNo='{0}'", Entity.ContractCustNo)).Tables[0];
-            if (dt.Rows.Count <= 0)
-            {
-                var actuallyLeaveDate= objdata.PopulateDataSet(string.Format("select convert(char(10),MAX(OffLeaseActulDate),121) as date from Op_Contract where ContractStatus='3' and OffLeaseStatus='3' and ContractCustNo='{0}'", Entity.ContractCustNo)).Tables[0].Rows[0][0].ToString();
-                ButlerSrv.AppService appService = new ButlerSrv.AppService();
-                
-
-            }
-        }
 
         /// </summary>
         /// refund方法 
@@ -581,6 +556,153 @@ namespace project.Business.Op
                 "OffLeaseReason = '" + Entity.OffLeaseReason + "'" +
                 " where RowPointer='" + Entity.RowPointer + "'");
         }
+
+        #region 资源同步
+
+        /// <summary>
+        /// 资源同步方法
+        /// </summary>
+        /// <param name="resType">要同步的资源类型：rm,房屋;wp,工位;ad,广告位</param>
+        /// <param name="rentType">租赁类型：1，租赁；2，物业</param>
+        /// <param name="model">操作类型：add,添加租赁合同；out,正常退租合同；del，异常删除合同</param>
+        /// <param name="userName">操作的用户名称</param>
+        /// <param name="endTime">实际退租时间，如果不是正常退租，即model不等于"out",该参数即为null</param>
+        /// <returns></returns>
+        public string SyncResource(string resType, int rentType, string model, string userName, DateTime? endTime)
+        {
+            string result = string.Empty;
+            if (ConfigurationManager.AppSettings["IsPutZY"].ToString().Equals("Y"))
+            {
+                try
+                {
+                    ResourceService.ResourceService srv = new ResourceService.ResourceService
+                    {
+                        Timeout = 5000,
+                        Url = ConfigurationManager.AppSettings["ResourceUrl"].ToString()
+                    };
+                    string items = string.Empty;
+                    string sql = string.Empty;
+                    DataTable dt = null;
+                    Business.Base.BusinessCustomer cust = new Business.Base.BusinessCustomer();
+                    cust.load(Entity.ContractCustNo);
+                    if (resType.Equals("rm"))
+                    {
+                        //房屋
+                        sql = string.Format(@"SELECT RMID AS ResourceID,RMArea AS Quantity FROM Op_ContractRMRentalDetail 
+                                             WHERE RefRP='{0}' GROUP BY RMID,RMArea", Entity.RowPointer);
+                    }
+                    else if (resType.Equals("wp"))
+                    {
+                        //工位
+                        sql = string.Format(@"SELECT WPNo AS ResourceID,0 AS Quantity FROM Op_ContractWPRentalDetail 
+                                             WHERE RefRP='{0}' GROUP BY WPNo", Entity.RowPointer);
+                    }
+                    else
+                    {
+                        //广告位
+                        sql = string.Format(@"SELECT BBNo AS ResourceID,0 AS Quantity  FROM Op_ContractBBRentalDetail 
+                                             WHERE RefRP='{0}' GROUP BY BBNo", Entity.RowPointer);
+                    }
+                    dt = objdata.PopulateDataSet(sql).Tables[0];
+                    var rsList = new List<SycnResourceStatus>();
+                    foreach (DataRow dr in dt.Rows)
+                    {
+                        SycnResourceStatus rs = new SycnResourceStatus();
+                        rs.SysID = 1; //1.订单系统                           
+                        rs.BusinessID = Entity.RowPointer;
+                        rs.BusinessNo = Entity.ContractNo;
+                        rs.RentBeginTime = Entity.FeeStartDate;
+                        rs.CustLongName = cust.Entity.CustName;
+                        rs.CustShortName = cust.Entity.CustShortName;
+                        rs.CustTel = cust.Entity.CustTel;
+                        rs.RentType = 1;
+                        rs.UpdateTime = DateTime.Now;
+                        rs.UpdateUser = userName;
+                        //变化参数
+                        rs.ResourceID = dr["ResourceID"].ToString();
+                        rs.BusinessType = rentType;//1租赁，2物业
+                        rs.RentEndTime = endTime == null ? Entity.ContractEndDate : endTime;
+                        rs.RentArea = ParseDecimalForString(dr["Quantity"].ToString());
+                        rs.Status = model.Equals("add") ? 1 : 2;
+                        rsList.Add(rs);
+                        //items += (items == "" ? "" : ",") + JsonConvert.SerializeObject(rs);
+                    }
+                    if (model.Equals("add"))
+                        result = srv.LeaseIn(JsonConvert.SerializeObject(rsList));//租赁
+                    else if (model.Equals("del"))
+                        result = srv.LeaseDel(JsonConvert.SerializeObject(rsList));//取消租赁
+                    else if (model.Equals("out"))
+                        result = srv.LeaseOut(JsonConvert.SerializeObject(rsList));//退租
+
+                }
+                catch (Exception ex)
+                {
+                    result = ex.ToString();
+                }
+            }
+            else result = "已配置不同步";
+            return result;
+        }
+
+        #endregion
+
+        #region 管家同步
+
+        /// <summary>
+        /// 同步到管家
+        /// </summary>
+        /// <returns></returns>
+        public string SyncButlerForCustStatus()
+        {
+            string result = string.Empty;
+            if (ConfigurationManager.AppSettings["IsPutGJ"].ToString().Equals("Y"))
+            {
+                try
+                {
+                    string status = string.Empty;
+                    string date = string.Empty;
+                    ButlerSrv.AppService appService = new ButlerSrv.AppService
+                    {
+                        Timeout = 5000,
+                        Url = ConfigurationManager.AppSettings["ButlerUrl"].ToString()
+                    };
+                    if (objdata.PopulateDataSet(string.Format(@"SELECT 1 FROM Op_Contract WHERE ContractCustNo={0} 
+                        AND ContractStatus>=2", Entity.ContractCustNo)).Tables[0].Rows.Count > 0)
+                    {
+                        //存在过合同
+                        if (objdata.PopulateDataSet(string.Format(@"SELECT 1 FROM Op_Contract WHERE ContractCustNo={0} 
+                        AND ContractStatus='2'", Entity.ContractCustNo)).Tables[0].Rows.Count > 0)
+                        {
+                            //存在履约合同
+                            status = "1";
+                        }
+                        else
+                        {
+                            //不存在履约合同
+                            status = "2";
+                            date = objdata.PopulateDataSet(string.Format(@"SELECT CONVERT(CHAR(10),MAX(OffLeaseActulDate),121) AS EndDate 
+                            FROM Op_Contract WHERE ContractCustNo={0} AND ContractStatus='3'", Entity.ContractCustNo)).Tables[0].Rows[0][0].ToString();
+                        }
+
+                    }
+                    else
+                    {
+                        //不曾存在过合同
+                        status = "3";
+                    }
+                    appService.UpdateCustomer(Entity.ContractCustNo, status, date);
+                }
+                catch (Exception ex)
+                {
+                    result = ex.Message;
+                }
+            }
+            else result = "已配置不同步";
+            return result;
+        }
+        #endregion
+
+        #region 合同数据查询模块
 
         /// <summary>
         /// 按条件查询，支持分页
@@ -1221,5 +1343,7 @@ namespace project.Business.Op
             }
             return result;
         }
+
+        #endregion
     }
 }

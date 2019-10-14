@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
+using System.Configuration;
 using System.Data;
 namespace project.Business.Base
 {
@@ -42,7 +44,7 @@ namespace project.Business.Base
         {
             DataRow dr = objdata.PopulateDataSet("select a.*,b.CustShortName as RMCurrentCustName,c.LOCName as RMLOCNo1Name," +
                 "d.LOCName as RMLOCNo2Name,e.LOCName as RMLOCNo3Name,f.LOCName as RMLOCNo4Name " +
-                "from Mstr_Room a left join Mstr_Customer b on a.RMCurrentCustNo=b.CustNo "+
+                "from Mstr_Room a left join Mstr_Customer b on a.RMCurrentCustNo=b.CustNo " +
                 "left join Mstr_Location c on c.LOCNo=a.RMLOCNo1 " +
                 "left join Mstr_Location d on d.LOCNo=a.RMLOCNo2 " +
                 "left join Mstr_Location e on e.LOCNo=a.RMLOCNo3 " +
@@ -98,7 +100,7 @@ namespace project.Business.Base
                     "RMBuildSize=" + Entity.RMBuildSize + "," + "RMRentSize=" + Entity.RMRentSize + "," +
                     "RMAddr=" + "'" + Entity.RMAddr + "'" + "," + "RMRemark=" + "'" + Entity.RMRemark + "'" + "," +
                     "HaveAirCondition=" + (Entity.HaveAirCondition == true ? "1" : "0") + "," +
-                    "IsStatistics=" + (Entity.IsStatistics == true ? "1" : "0")+
+                    "IsStatistics=" + (Entity.IsStatistics == true ? "1" : "0") +
                     " where RMID='" + Entity.RMID + "'";
             return objdata.ExecuteNonQuery(sqlstr);
         }
@@ -127,14 +129,14 @@ namespace project.Business.Base
         /// <returns></returns>
         public int reserve()
         {
-            return objdata.ExecuteNonQuery("update Mstr_Room "+
-                "set RMReservedDate = '" + Entity.RMReservedDate.ToString("yyyy-MM-dd HH:mm:ss") + "',"+
+            return objdata.ExecuteNonQuery("update Mstr_Room " +
+                "set RMReservedDate = '" + Entity.RMReservedDate.ToString("yyyy-MM-dd HH:mm:ss") + "'," +
                 "RMEndReservedDate = '" + Entity.RMEndReservedDate.ToString("yyyy-MM-dd HH:mm:ss") + "'," +
-                "RMCurrentCustNo='" + Entity.RMCurrentCustNo + "',"+
+                "RMCurrentCustNo='" + Entity.RMCurrentCustNo + "'," +
                 "RMStatus='reserve' " +
                 "where RMID='" + Entity.RMID + "'");
         }
-        
+
         /// <summary>
         /// 取消预留 
         /// </summary>
@@ -309,7 +311,7 @@ namespace project.Business.Base
                     "left join Mstr_Location e on e.LOCNo=a.RMLOCNo3 " +
                     "left join Mstr_Location f on f.LOCNo=a.RMLOCNo4 ",
                     "a.*,b.CustShortName as RMCurrentCustName,c.LOCName as RMLOCNo1Name," +
-                    "d.LOCName as RMLOCNo2Name,e.LOCName as RMLOCNo3Name,f.LOCName as RMLOCNo4Name ", 
+                    "d.LOCName as RMLOCNo2Name,e.LOCName as RMLOCNo3Name,f.LOCName as RMLOCNo4Name ",
                     wherestr, startRow, pageSize, OrderField));
             }
             else
@@ -320,12 +322,12 @@ namespace project.Business.Base
                     "left join Mstr_Location e on e.LOCNo=a.RMLOCNo3 " +
                     "left join Mstr_Location f on f.LOCNo=a.RMLOCNo4 ",
                     "a.*,b.CustShortName as RMCurrentCustName,c.LOCName as RMLOCNo1Name," +
-                    "d.LOCName as RMLOCNo2Name,e.LOCName as RMLOCNo3Name,f.LOCName as RMLOCNo4Name ", 
+                    "d.LOCName as RMLOCNo2Name,e.LOCName as RMLOCNo3Name,f.LOCName as RMLOCNo4Name ",
                     wherestr, START_ROW_INIT, START_ROW_INIT, OrderField));
             }
             return entitys;
         }
-        
+
         /// </summary>
         ///Query 方法 dt查询结果
         /// </summary>
@@ -363,5 +365,39 @@ namespace project.Business.Base
             }
             return result;
         }
+
+        #region 资源系统同步
+        /// <summary>
+        /// 房间资源同步
+        /// </summary>
+        /// <param name="model">au=>add or update(添加或修改);del=>删除</param>
+        /// <returns></returns>
+        public string SyncResource(string model)
+        {
+            string result = string.Empty;
+            if (ConfigurationManager.AppSettings["IsPutZY"].ToString().Equals("Y"))
+            {
+                try
+                {
+                    ResourceService.ResourceService srv = new ResourceService.ResourceService
+                    {
+                        Timeout = 5000,
+                        Url = ConfigurationManager.AppSettings["ResourceUrl"].ToString()
+                    };
+                    if (model.Equals("au"))
+                        result = srv.AddOrUpdateRoom(JsonConvert.SerializeObject(Entity));
+                    else
+                        result = srv.DeleteResource(Entity.RMID);
+                }
+                catch (Exception ex)
+                {
+                    result = ex.ToString();
+                }
+            }
+            else result = "已配置不同步";
+            return result;
+        }
+
+        #endregion
     }
 }

@@ -33,7 +33,7 @@
             月份&nbsp;<input type="text" class="input-text size-MINI" id="LaterFeeMonth" value="<%=Month %>" style="width:110px" />
             结算日期&nbsp;<input type="text" class="input-text size-MINI" id="ARDate" value="<%=ARDate %>" style="width:110px" />
             截止日期&nbsp;<input type="text" class="input-text size-MINI" id="EndDate" value="<%=EndDate %>" style="width:110px" />
-            订单类型&nbsp;<%=ContractType %>
+            订单类型&nbsp;<%=OrderType %>&nbsp;&nbsp;
 		    <button type="submit" class="btn btn-success radius" onclick="select()"><i class="Hui-iconfont">&#xe665;</i> 检索</button>&nbsp;&nbsp;
 	    </div>
 	    <div class="mt-5" id="outerlist">
@@ -59,7 +59,7 @@
                     Month = $("#LaterFeeMonth").val();
                     ARDate = $("#ARDate").val();
                     EndDate = $("#EndDate").val();
-                    ContractType = $("#ContractType").val();
+                    OrderType = $("#OrderType").val();
 
                     $("#checkall").click(function () {
                         var flag = $(this).prop("checked");
@@ -93,7 +93,7 @@
         var Month = "<%=Month %>";
         var ARDate = "<%=ARDate %>";
         var EndDate = "<%=EndDate %>";
-        var ContractType = "";
+        var OrderType = "";
         function genorder() {
             var orderID = "";
             var checklist = jQuery("#tbody input:checkbox:checked");
@@ -115,7 +115,7 @@
             submitData.Month = Month;
             submitData.ARDate = ARDate;
             submitData.EndDate = EndDate;
-            submitData.ContractType = ContractType;
+            submitData.OrderType = OrderType;
             transmitData(datatostr(submitData));
             return;
         }
@@ -125,7 +125,7 @@
             submitData.Month = $("#LaterFeeMonth").val();
             submitData.ARDate = $("#ARDate").val();
             submitData.EndDate = $("#EndDate").val();
-            submitData.ContractType = $("#ContractType").val();
+            submitData.OrderType = $("#OrderType").val();
             transmitData(datatostr(submitData));
             return;
         }

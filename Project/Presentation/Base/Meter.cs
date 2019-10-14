@@ -12,6 +12,7 @@ using System.Data.SqlClient;
 using System.Net.Json;
 using Newtonsoft.Json;
 using project.Business.Base;
+using project.Entity.Base;
 
 namespace project.Presentation.Base
 {
@@ -186,7 +187,80 @@ namespace project.Presentation.Base
                 result = viewaction(jp);
             else if (jp.getValue("Type") == "change")
                 result = changeaction(jp);
+            else if (jp.getValue("Type") == "changesubmit")
+                result = changesubmitaction(jp);
             return result;
+        }
+
+        private string changesubmitaction(JsonArrayParse jp)
+        {
+            string flag = "2";
+            JsonObjectCollection collection = new JsonObjectCollection();
+            try
+            {
+                var oldMeter = new BusinessMeter();
+                oldMeter.load(jp.getValue("meterNo"));
+                /*
+                 * 新表数据装载
+                 */
+                var newMeter = new BusinessMeter(JsonConvert.DeserializeObject<EntityMeter>(JsonConvert.SerializeObject(oldMeter.Entity)));
+                newMeter.Entity.MeterNo = jp.getValue("newMeterNo");
+                newMeter.Entity.MeterName = jp.getValue("newMeterName");
+                newMeter.Entity.MeterRate = ParseDecimalForString(jp.getValue("newMeterRate"));
+                newMeter.Entity.MeterDigit = ParseIntForString(jp.getValue("newMeterDigit"));
+                newMeter.Entity.MeterReadout = ParseDecimalForString(jp.getValue("newMeterReadout"));
+                newMeter.Entity.MeterType = jp.getValue("newMeterType");
+                newMeter.Entity.MeterSize = jp.getValue("newMeterSizeType");
+                newMeter.Entity.MeterUsageType = jp.getValue("newMeterUseType");
+                newMeter.Entity.MeterNatureType = jp.getValue("newMeterNatureType");
+                newMeter.Entity.Addr = jp.getValue("newMeterAddr");
+                newMeter.Entity.MeterCreator = user.Entity.UserName;
+                newMeter.Entity.MeterCreateDate = DateTime.Now;
+                newMeter.Entity.MeterReadoutDate = DateTime.Now;
+                /*
+                 * 旧表停用
+                 */
+                oldMeter.Entity.MeterStatus = "close";
+                /*
+                 * 旧表产生身前的最后一条抄表记录
+                 */
+                var readout = new Business.Op.BusinessReadout();
+                readout.Entity.RowPointer = Guid.NewGuid().ToString();
+                readout.Entity.MeterNo = oldMeter.Entity.MeterNo;
+                readout.Entity.RMID = oldMeter.Entity.MeterRMID;
+                readout.Entity.MeterType = oldMeter.Entity.MeterType;
+                readout.Entity.MeteRate = oldMeter.Entity.MeterRate;
+                readout.Entity.ReadoutType = "2";
+                readout.Entity.LastReadout = oldMeter.Entity.MeterReadout;
+                readout.Entity.Readout = ParseDecimalForString(jp.getValue("endReadout"));
+                readout.Entity.JoinReadings = 0;
+                readout.Entity.Readings = ParseDecimalForString(jp.getValue("reading"));
+                readout.Entity.ROOperator = user.Entity.UserName;
+                readout.Entity.RODate = DateTime.Now;
+                readout.Entity.ROCreateDate = DateTime.Now;
+                readout.Entity.ROCreator = user.Entity.UserName;
+                if (readout.Save("insert") > 0)
+                {
+                    if (newMeter.Save("insert") > 0)
+                    {
+                        if (oldMeter.valid() > 0) flag = "1";
+                        else
+                        {
+                            newMeter.delete();
+                            readout.delete();
+                        }
+                    }
+                    else readout.delete();
+                }
+            }
+            catch (Exception ex)
+            {
+                flag = "3";
+                collection.Add(new JsonStringValue("ex", ex.Message));
+            }
+            collection.Add(new JsonStringValue("type", "changesubmit"));
+            collection.Add(new JsonStringValue("flag", flag));
+            return collection.ToString();
         }
 
         private string changeaction(JsonArrayParse jp)

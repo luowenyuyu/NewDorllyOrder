@@ -4,12 +4,15 @@ using System.Configuration;
 using System.Web;
 using System.Web.Security;
 using System.Data.SqlClient;
+using log4net;
 
 public class Data
 {
     public Data()
     {
     }
+
+    private static readonly ILog logger = LogManager.GetLogger(typeof(Data));
 
     public static SqlConnection Conn()
     {
@@ -34,7 +37,30 @@ public class Data
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine(ex.Message);
+            //logger.Debug(ex.ToString());
             return 0;
+        }
+        finally
+        {
+            if (cmd != null)
+                cmd.Dispose();
+            if (con != null)
+                con.Dispose();
+        }
+    }
+    public int ExecuteNonQueryEx(string cmdText)
+    {
+        SqlConnection con = Conn();
+        SqlCommand cmd = null;
+        try
+        {
+            cmd = new SqlCommand(cmdText, con);
+            con.Open();
+            return cmd.ExecuteNonQuery();
+        }
+        catch (Exception ex)
+        {
+            throw ex;
         }
         finally
         {

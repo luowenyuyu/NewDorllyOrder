@@ -37,14 +37,14 @@ namespace project.Presentation.Op
                         EndDate = ParseDateForString(now.ToString("yyyy-MM") + "-01").AddMonths(1).AddDays(-1).ToString("yyyy-MM-dd");
                         list = createList(Month, ARDate, EndDate, "%");
                         
-                        Business.Base.BusinessContractType bc = new Business.Base.BusinessContractType();
-                        ContractType += "<select id=\"ContractType\" class=\"input-text required\" style=\"width:120px;\">";
-                        ContractType += "<option value=''>全部</option>";
-                        foreach (Entity.Base.EntityContractType it in bc.GetListQuery(string.Empty, string.Empty))
+                        Business.Base.BusinessOrderType bc = new Business.Base.BusinessOrderType();
+                        OrderType += "<select id=\"OrderType\" class=\"input-text required\" style=\"width:150px;\">";
+                        OrderType += "<option value=''>全部</option>";
+                        foreach (Entity.Base.EntityOrderType it in bc.GetListQuery(string.Empty, string.Empty))
                         {
-                            ContractType += "<option value='" + it.ContractTypeNo + "'>" + it.ContractTypeName + "</option>";
+                            OrderType += "<option value='" + it.OrderTypeNo + "'>" + it.OrderTypeName + "</option>";
                         }
-                        ContractType += "</select>";
+                        OrderType += "</select>";
                     }
                 }
                 else
@@ -62,7 +62,7 @@ namespace project.Presentation.Op
 
         Data obj = new Data();
         protected string list = "";
-        protected string ContractType = "";
+        protected string OrderType = "";
         protected string Month = "";
         protected string ARDate = "";
         protected string EndDate = "";

@@ -84,7 +84,7 @@ namespace project.Presentation.Op
                         ContractTypeStrS += "</select>";
 
                         ContractSPNoStr = "<select class=\"input-text required\" id=\"ContractSPNo\">";
-                        ContractSPNoStr += "<option value=\"\"></option>";
+                        ContractSPNoStr += "<option value=\"\">请选择</option>";
                         ContractSPNoStrS = "<select class=\"input-text size-MINI\" id=\"ContractSPNoS\" style=\"width:120px;\" >";
                         ContractSPNoStrS += "<option value=\"\" selected>全部</option>";
                         Business.Base.BusinessServiceProvider bc1 = new project.Business.Base.BusinessServiceProvider();
@@ -96,21 +96,14 @@ namespace project.Presentation.Op
                         ContractSPNoStr += "</select>";
                         ContractSPNoStrS += "</select>";
 
-
-                        Business.Base.BusinessSetting setting = new Business.Base.BusinessSetting();
-                        setting.load("RMRentFee");
-                        RMRentFee = setting.Entity.DecimalValue.ToString("0.####");
-                        RMRentSRVNo = setting.Entity.SRVNo;
-
                         SRVNo1Str = "<select class=\"input-text size-MINI\" id=\"SRVNo1\">";
-                        SRVNo1Str += "<option value='" + setting.Entity.SRVNo + "'>" + setting.Entity.SRVName + "</option>";
-                        setting.load("RMRentFee_DL");
-                        SRVNo1Str += "<option value='" + setting.Entity.SRVNo + "'>" + setting.Entity.SRVName + "</option>";
-
+                        SRVNo1Str += "<option value=\"\">请选择</option>";
+                        Business.Base.BusinessService service = new Business.Base.BusinessService();
+                        foreach (Entity.Base.EntityService item in service.GetListQuery("","","", "FWLB-004-001", ""))
+                        {
+                            SRVNo1Str += string.Format("<option value='{0}' data-price='{1}'>{2}</option>", item.SRVNo, item.SRVPrice.ToString("0.####"), item.SRVName);
+                        }
                         SRVNo1Str += "</select>";
-
-                        setting.load("RMSPNo");
-                        RMSPNo = setting.Entity.StringValue;
                     }
                 }
                 else
@@ -136,9 +129,6 @@ namespace project.Presentation.Op
         protected string ContractSPNoStr = "";
         protected string ContractSPNoStrS = "";
         protected string SRVNo1Str = "";
-        protected string RMRentFee = "";
-        protected string RMRentSRVNo = "";
-        protected string RMSPNo = "";
 
         private string createList(string ContractNo, string ContractNoManual, string ContractType, string ContractSPNo, string ContractCustNo,
             string MinContractSignedDate, string MaxContractSignedDate, string MinContractEndDate, string MaxContractEndDate, string ContractStatusS,
@@ -910,144 +900,42 @@ namespace project.Presentation.Op
                 }
                 else
                 {
+                    string msg = string.Empty;
                     if (bc.Entity.ContractStatus == "1")
                     {
+                        //合同审核
                         bc.Entity.ContractStatus = "2";
-                        string InfoBar = bc.approve_RM(user.Entity.UserName);
-                        if (InfoBar != "")
+                        msg = bc.ContractReview("Contract_ReviewRM", bc.Entity.RowPointer, user.Entity.UserName);
+                        if (string.IsNullOrEmpty(msg))
                         {
-                            flag = "5";
-                            collection.Add(new JsonStringValue("InfoBar", InfoBar));
+                            //成功
+                            collection.Add(new JsonStringValue("status", bc.Entity.ContractStatus));
+                            collection.Add(new JsonStringValue("GJSync", bc.SyncButlerForCustStatus()));//同步到管家
+                            collection.Add(new JsonStringValue("ZYSync", bc.SyncResource("rm", 1, "add", user.Entity.UserName, null)));//同步到资源
                         }
                         else
                         {
-                            collection.Add(new JsonStringValue("status", bc.Entity.ContractStatus));
-                            #region 同步到管家
-                            try
-                            {
-                                ButlerSrv.AppService appService = new ButlerSrv.AppService { Timeout = 5000 };
-                                appService.UpdateCustomer(bc.Entity.ContractCustNo, "1", "");
-                            }
-                            catch (Exception ex)
-                            {
-                                collection.Add(new JsonStringValue("syncButlerException", ex.ToString()));
-                            }
-                            #endregion
-
-                            #region 同步到资源系统
-                            string syncResult = string.Empty;
-                            try
-                            {
-                                ResourceService.ResourceService srv = new ResourceService.ResourceService
-                                {
-                                    Timeout = 5000,
-                                    Url = ConfigurationManager.AppSettings["ResourceServiceUrl"].ToString()
-                                };
-                                string Items = "";
-                                Business.Base.BusinessCustomer cust = new Business.Base.BusinessCustomer();
-                                cust.load(bc.Entity.ContractCustNo);
-                                DataTable dt = obj.PopulateDataSet("SELECT RMID,RMArea FROM Op_ContractRMRentalDetail WHERE RefRP='" + bc.Entity.RowPointer + "' GROUP BY RMID,RMArea").Tables[0];
-                                foreach (DataRow dr in dt.Rows)
-                                {
-                                    SycnResourceStatus rs = new SycnResourceStatus();
-                                    rs.SysID = 1; //1.订单
-                                    rs.ResourceID = dr["RMID"].ToString();
-                                    rs.RentArea = ParseDecimalForString(dr["RMArea"].ToString());
-                                    rs.BusinessID = bc.Entity.RowPointer;
-                                    rs.BusinessNo = bc.Entity.ContractNo;
-                                    rs.BusinessType = 1;//1租赁，2物业
-                                    rs.RentBeginTime = bc.Entity.FeeStartDate;
-                                    rs.RentEndTime = bc.Entity.ContractEndDate;
-                                    rs.CustLongName = bc.Entity.ContractCustName;
-                                    rs.CustShortName = cust.Entity.CustShortName;
-                                    rs.CustTel = cust.Entity.CustTel;
-                                    rs.Status = 1;
-                                    rs.RentType = 1;
-                                    rs.UpdateTime = GetDate();
-                                    rs.UpdateUser = user.Entity.UserName;
-
-                                    Items += (Items == "" ? "" : ",") + JsonConvert.SerializeObject(rs);
-                                }
-                                syncResult = srv.LeaseIn("[" + Items + "]");
-                            }
-                            catch (Exception ex)
-                            {
-                                syncResult = ex.ToString();
-                            }
-                            collection.Add(new JsonStringValue("sync", syncResult));
-                            #endregion
+                            //失败
+                            flag = "5";
+                            collection.Add(new JsonStringValue("InfoBar", msg));
                         }
-
                     }
                     else
                     {
                         //取消审核
-                        string InfoBar = bc.CancelAudit(user.Entity.UserName);
-                        if (InfoBar != "")
+                        msg = bc.ContractCancel(bc.Entity.RowPointer, user.Entity.UserName);
+                        if (string.IsNullOrEmpty(msg))
                         {
-                            flag = "5";
-                            collection.Add(new JsonStringValue("InfoBar", InfoBar));
+                            //成功
+                            collection.Add(new JsonStringValue("status", "1"));
+                            collection.Add(new JsonStringValue("GJSync", bc.SyncButlerForCustStatus()));//同步到管家
+                            collection.Add(new JsonStringValue("ZYSync", bc.SyncResource("rm", 1, "del", user.Entity.UserName, null)));//同步到资源
                         }
                         else
                         {
-                            collection.Add(new JsonStringValue("status", "1"));
-                            #region 同步到管家
-                            try
-                            {
-                                string status = string.Empty;
-                                string date = string.Empty;
-                                bc.CheckCustStatus(out status, out date);
-                                ButlerSrv.AppService appService = new ButlerSrv.AppService { Timeout = 5000 };
-                                appService.UpdateCustomer(bc.Entity.ContractCustNo, status, date);
-                            }
-                            catch (Exception ex)
-                            {
-                                collection.Add(new JsonStringValue("syncButlerException", ex.ToString()));
-                            }
-                            #endregion
-
-                            #region 同步到资源系统
-                            string syncResult = string.Empty;
-                            try
-                            {
-                                ResourceService.ResourceService srv = new ResourceService.ResourceService
-                                {
-                                    Timeout = 5000,
-                                    Url = ConfigurationManager.AppSettings["ResourceServiceUrl"].ToString()
-                                };
-                                string Items = "";
-                                Business.Base.BusinessCustomer cust = new Business.Base.BusinessCustomer();
-                                cust.load(bc.Entity.ContractCustNo);
-                                DataTable dt = obj.PopulateDataSet("SELECT RMID,RMArea FROM Op_ContractRMRentalDetail WHERE RefRP='" + bc.Entity.RowPointer + "' GROUP BY RMID,RMArea").Tables[0];
-                                foreach (DataRow dr in dt.Rows)
-                                {
-                                    SycnResourceStatus rs = new SycnResourceStatus();
-                                    rs.SysID = 1; //1.订单
-                                    rs.ResourceID = dr["RMID"].ToString();
-                                    rs.RentArea = ParseDecimalForString(dr["RMArea"].ToString());
-                                    rs.BusinessID = bc.Entity.RowPointer;
-                                    rs.BusinessNo = bc.Entity.ContractNo;
-                                    rs.BusinessType = 1;//1租赁，2物业
-                                    rs.RentBeginTime = bc.Entity.FeeStartDate;
-                                    rs.RentEndTime = bc.Entity.ContractEndDate;
-                                    rs.CustLongName = bc.Entity.ContractCustName;
-                                    rs.CustShortName = cust.Entity.CustShortName;
-                                    rs.CustTel = cust.Entity.CustTel;
-                                    rs.Status = 2;
-                                    rs.RentType = 1;
-                                    rs.UpdateTime = GetDate();
-                                    rs.UpdateUser = user.Entity.UserName;
-
-                                    Items += (Items == "" ? "" : ",") + JsonConvert.SerializeObject(rs);
-                                }
-                                syncResult = srv.LeaseDel("[" + Items + "]");
-                            }
-                            catch (Exception ex)
-                            {
-                                syncResult = ex.ToString();
-                            }
-                            collection.Add(new JsonStringValue("sync", syncResult));
-                            #endregion
+                            //失败
+                            flag = "5";
+                            collection.Add(new JsonStringValue("InfoBar", msg));
                         }
                     }
                 }

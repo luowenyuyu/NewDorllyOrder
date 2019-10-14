@@ -280,22 +280,7 @@ namespace project.Presentation.Base
                         flag = "2";
                     else
                     {
-                        #region 同步到资源系统
-
-                        string syncResult = string.Empty;
-                        try
-                        {
-                            ResourceService.ResourceService srv = new ResourceService.ResourceService();
-                            srv.Url = ConfigurationManager.AppSettings["ResourceServiceUrl"].ToString();
-                            syncResult = srv.DeleteResource(bc.Entity.RMID);
-                        }
-                        catch (Exception ex)
-                        {
-                            syncResult = ex.ToString();
-                        }
-                        collection.Add(new JsonStringValue("sync", syncResult));
-
-                        #endregion
+                        collection.Add(new JsonStringValue("ZYSync", bc.SyncResource("del")));
                     }
                 }
             }
@@ -335,22 +320,7 @@ namespace project.Presentation.Base
                         flag = "2";
                     else
                     {
-                        #region 同步到资源系统
-
-                        string syncResult = string.Empty;
-                        try
-                        {
-                            ResourceService.ResourceService srv = new ResourceService.ResourceService();
-                            srv.Url = ConfigurationManager.AppSettings["ResourceServiceUrl"].ToString();
-                            syncResult = srv.AddOrUpdateRoom(JsonConvert.SerializeObject(bc.Entity));
-                        }
-                        catch (Exception ex)
-                        {
-                            syncResult = ex.ToString();
-                        }
-                        collection.Add(new JsonStringValue("sync", syncResult));
-
-                        #endregion
+                        collection.Add(new JsonStringValue("ZYSync", bc.SyncResource("au")));
                     }
                 }
                 else
@@ -383,22 +353,7 @@ namespace project.Presentation.Base
                             flag = "2";
                         else
                         {
-                            #region 同步到资源系统
-
-                            string syncResult = string.Empty;
-                            try
-                            {
-                                ResourceService.ResourceService srv = new ResourceService.ResourceService();
-                                srv.Url = ConfigurationManager.AppSettings["ResourceServiceUrl"].ToString();
-                                syncResult = srv.AddOrUpdateRoom(JsonConvert.SerializeObject(bc.Entity));
-                            }
-                            catch (Exception ex)
-                            {
-                                syncResult = ex.ToString();
-                            }
-                            collection.Add(new JsonStringValue("sync", syncResult));
-
-                            #endregion
+                            collection.Add(new JsonStringValue("ZYSync", bc.SyncResource("au")));
                         }
                     }
                 }

@@ -74,7 +74,7 @@ namespace project.Presentation.Base
                         SRVNo += "<option value=''></option>";
                         SRVNoS += "<select id=\"SRVNoS\" class=\"input-text required size-MINI\" style=\"width:120px\">";
                         SRVNoS += "<option value=''>全部</option>";
-                        foreach (Entity.Base.EntityService it in loc.GetListQuery("","","","","","",""))
+                        foreach (Entity.Base.EntityService it in loc.GetListQuery("","","","",""))
                         {
                             SRVNo += "<option value='" + it.SRVNo + "'>" + it.SRVName + "</option>";
                             SRVNoS += "<option value='" + it.SRVNo + "'>" + it.SRVName + "</option>";

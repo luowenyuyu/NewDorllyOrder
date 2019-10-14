@@ -10,7 +10,7 @@ namespace project.Business.Op
     public sealed class BusinessContractRMRentList : project.Business.AbstractPmBusiness
     {
         private project.Entity.Op.EntityContractRMRentList _entity = new project.Entity.Op.EntityContractRMRentList();
-        public string OrderField = "A.SRVNo,a.RMID,a.WPNo,a.FeeEndDate";
+        public string OrderField = "A.FeeStartDate,A.RMID,A.WPNo,A.SRVNo";
         Data objdata = new Data();
 
         /// <summary>
@@ -49,6 +49,8 @@ namespace project.Business.Op
             _entity.SRVName = dr["SRVName"].ToString();
             _entity.FeeStartDate = ParseDateTimeForString(dr["FeeStartDate"].ToString());
             _entity.FeeEndDate = ParseDateTimeForString(dr["FeeEndDate"].ToString());
+            _entity.FeeQty= ParseDecimalForString(dr["FeeQty"].ToString());
+            _entity.FeeUnitPrice= ParseDecimalForString(dr["FeeUnitPrice"].ToString());
             _entity.FeeAmount = ParseDecimalForString(dr["FeeAmount"].ToString());
             _entity.FeeStatus = dr["FeeStatus"].ToString();
             _entity.Creator = dr["Creator"].ToString();
@@ -173,6 +175,8 @@ namespace project.Business.Op
                 entity.SRVName = dr["SRVName"].ToString();
                 entity.FeeStartDate = ParseDateTimeForString(dr["FeeStartDate"].ToString());
                 entity.FeeEndDate = ParseDateTimeForString(dr["FeeEndDate"].ToString());
+                entity.FeeQty = ParseDecimalForString(dr["FeeQty"].ToString());
+                entity.FeeUnitPrice = ParseDecimalForString(dr["FeeUnitPrice"].ToString());
                 entity.FeeAmount = ParseDecimalForString(dr["FeeAmount"].ToString());
                 entity.FeeStatus = dr["FeeStatus"].ToString();
                 entity.Creator = dr["Creator"].ToString();

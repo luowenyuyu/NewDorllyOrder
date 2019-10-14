@@ -78,7 +78,7 @@ namespace project.Presentation.Op
         }
 
 
-        #region
+        #region 租金单子打印
         private static void PrintHeader(Document doc, DataRow dr)
         {
             PdfPTable Tit = new PdfPTable(1);
@@ -376,7 +376,7 @@ namespace project.Presentation.Op
         }
         #endregion
 
-        #region
+        #region 物业单子打印
         private static void PrintHeader_PT(Document doc, DataRow dr)
         {
             PdfPTable Tit = new PdfPTable(1);

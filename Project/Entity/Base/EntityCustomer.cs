@@ -27,6 +27,7 @@ namespace project.Entity.Base
         private string _CustCreator;
         private bool _IsExternal;
 
+
         /// <summary>缺省构造函数</summary>
         public EntityCustomer() { }
 

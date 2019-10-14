@@ -190,7 +190,7 @@
                     <td class="tdr1"><%=ODContractSPNoStr %></td>
                 </tr>
                 <tr>
-                    <td class="tdl1">订单编号</td>
+                    <td class="tdl1">合同编号</td>
                     <td class="tdr1">
                         <input type="text" id="ODContractNo" class="input-text size-MINI" /></td>
                     <td class="tdl1">手工订单编号</td>
@@ -841,16 +841,17 @@
             }
             if (vjson.type == "ODSRVNoChange") {
                 if (vjson.flag == "1") {
-                    $("#ODTaxRate").val(vjson.SRVTaxRate).change();
+                    $("#ODUnitPrice").val(vjson.SRVPrice);
+                    $("#ODTaxRate").val(vjson.SRVTaxRate).change();                    
                     //$("#ODSRVCalType").val(vjson.SRVCalType);
                     //$("#ODContractSPNo").val(vjson.SRVSPNo);                    
                     //$("#SRVRoundType").val(vjson.SRVRoundType);
                     //$("#ODARAmount").val(vjson.amount);
                     //$("#ODTaxAmount").val(vjson.taxAmount);
                 }
-                else {
-                    layer.alert("获取数据出错！");
-                }
+                //else {
+                //    layer.alert("获取数据出错！");
+                //}
                 return;
             }
             if (vjson.type == "CalcAmount") {

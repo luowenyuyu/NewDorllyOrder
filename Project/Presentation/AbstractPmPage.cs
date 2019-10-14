@@ -541,6 +541,9 @@ namespace project.Presentation
         public Nullable<int> Status { get; set; }
         public string UpdateUser { get; set; }
         public Nullable<System.DateTime> UpdateTime { get; set; }
+        /// <summary>
+        /// 1:客户占用;2:内部占用
+        /// </summary>
         public Nullable<int> RentType { get; set; }
     }
 

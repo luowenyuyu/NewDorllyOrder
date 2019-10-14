@@ -202,7 +202,7 @@
                     $("#outerlist").html(vjson.liststr);
                     $("#selectKey").val("");
                     reflist();
-                    console.log(vjson.sync);
+                    console.log(vjson.ZYSync);
                 }
                 else {
                     layer.alert("数据操作出错！");
@@ -216,7 +216,7 @@
                     $("#list").css("display", "");
                     $("#edit").css("display", "none");
                     reflist();
-                    console.log(vjson.sync);
+                    console.log(vjson.ZYSync);
                 }
                 else if (vjson.flag == "3") {
                     showMsg("BBNo", "此广告位编号已存在", "1");

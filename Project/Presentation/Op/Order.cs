@@ -737,9 +737,9 @@ namespace project.Presentation.Op
                                 }
                                 if (cnt == 0 && it.ODARAmount > 0)
                                 {
-                                    DataTable dt1 = obj.PopulateDataSet("select APNo from Mstr_ChargeAccount where CANo='" + it.ODCANo + "'").Tables[0];
+                                    DataTable dt1 = obj.PopulateDataSet("SELECT SRVFinanceReceivableCode FROM Mstr_Service WHERE SRVNo='" + it.ODSRVNo + "'").Tables[0];
                                     if (dt1.Rows.Count > 0)
-                                        JFSubject = dt1.Rows[0]["APNo"].ToString();
+                                        JFSubject = dt1.Rows[0]["SRVFinanceReceivableCode"].ToString();
 
                                     SPNo = it.ODContractSPNo;
 
@@ -753,11 +753,6 @@ namespace project.Presentation.Op
                                 }
 
                             }
-                            //if (FID.Length > 1) FID = FID.Substring(0, FID.Length - 1);
-                            //if (SRVName.Length > 1) SRVName = SRVName.Substring(0, SRVName.Length - 1);
-                            //FID += "-" + bc.Entity.CustShortName;
-                            //FID += "-" + bc.Entity.OrderTime.ToString("yyyy/MM");
-                            //FID += "-(" + SRVName + ")";
 
                             ///////////////////////////////////////////////
                             if (ResourceNo.Length > 1) FID = ResourceNo.Substring(0, ResourceNo.Length - 1);
@@ -827,7 +822,7 @@ namespace project.Presentation.Op
                                 U8Return ot = new U8Return();
                                 object oj = JsonToObject(result, ot);
                                 U8Msg msg = ((U8Return)oj).rtn[0];
-                                if (msg.flag == "True")
+                                if (msg.flag == "1")
                                 {
                                     //collection.Add(new JsonStringValue("liststr", createList(jp.getValue("OrderNoS"), jp.getValue("OrderTypeS"), jp.getValue("CustNoS"),
                                     //    jp.getValue("OrderTimeS"), jp.getValue("MinOrderCreateDate"), jp.getValue("MaxOrderCreateDate"), jp.getValue("OrderStatusS"),
@@ -1483,21 +1478,9 @@ namespace project.Presentation.Op
 
                 Business.Base.BusinessService bs = new Business.Base.BusinessService();
                 bs.load(jp.getValue("ODSRVNo"));
-                bc.Entity.ODCANo = bs.Entity.CANo;
+                bc.Entity.ODCANo = bs.Entity.SRVFinanceFeeCode;
                 bc.Entity.ODSRVTypeNo1 = bs.Entity.SRVTypeNo1;
                 bc.Entity.ODSRVTypeNo2 = bs.Entity.SRVTypeNo2;
-                //bc.Entity.ODPaidinAmount = ParseDecimalForString(jp.getValue("ODPaidinAmount"));
-                //bc.Entity.ODReduceAmount = ParseDecimalForString(jp.getValue("ODReduceAmount"));
-                //bc.Entity.ODPaidDate = ParseDateForString(jp.getValue("ODPaidDate"));
-                //bc.Entity.ODFeeReceiver = jp.getValue("ODFeeReceiver");
-                //bc.Entity.ODFeeReceiveRemark = jp.getValue("ODFeeReceiveRemark");
-                //bc.Entity.ODReduceAmount = ParseDecimalForString(jp.getValue("ODReduceAmount"));
-                //bc.Entity.ODReduceStartDate = ParseDateForString(jp.getValue("ODReduceStartDate"));
-                //bc.Entity.ODReduceEndDate = ParseDateForString(jp.getValue("ODReduceEndDate"));
-                //bc.Entity.ODReducedDate = ParseDateForString(jp.getValue("ODReducedDate"));
-                //bc.Entity.ODReducePerson = jp.getValue("ODReducePerson");
-                //bc.Entity.ODReduceReason = jp.getValue("ODReduceReason");
-                //bc.Entity.ODCANo = jp.getValue("ODCANo");
                 int r = bc.Save();
                 if (r <= 0)
                     flag = "2";
@@ -1575,7 +1558,7 @@ namespace project.Presentation.Op
                 string subtype1 = "";
                 int row1 = 0;
                 Business.Base.BusinessService bt1 = new Business.Base.BusinessService();
-                foreach (Entity.Base.EntityService it in bt1.GetListQuery(string.Empty, string.Empty, bc.Entity.ODSRVTypeNo1, bc.Entity.ODSRVTypeNo2, string.Empty, string.Empty, string.Empty))
+                foreach (Entity.Base.EntityService it in bt1.GetListQuery(string.Empty, string.Empty, bc.Entity.ODSRVTypeNo1, bc.Entity.ODSRVTypeNo2, string.Empty))
                 {
                     subtype1 += it.SRVNo + ":" + it.SRVName + ";";
                     row1++;
@@ -1639,6 +1622,7 @@ namespace project.Presentation.Op
                 Business.Base.BusinessService bc = new Business.Base.BusinessService();
                 bc.load(jp.getValue("ODSRVNo"));
                 collection.Add(new JsonStringValue("SRVTaxRate", bc.Entity.SRVTaxRate.ToString()));
+                collection.Add(new JsonStringValue("SRVPrice", bc.Entity.SRVPrice.ToString("0.####")));
                 /*
                 collection.Add(new JsonStringValue("SRVSPNo", bc.Entity.SRVSPNo));
                 collection.Add(new JsonStringValue("SRVCalType", bc.Entity.SRVCalType));                
@@ -1714,7 +1698,7 @@ namespace project.Presentation.Op
 
                 int row1 = 0;
                 Business.Base.BusinessService bt1 = new Business.Base.BusinessService();
-                foreach (Entity.Base.EntityService it in bt1.GetListQuery(string.Empty, string.Empty, type, firsubtype, string.Empty, string.Empty, string.Empty))
+                foreach (Entity.Base.EntityService it in bt1.GetListQuery(string.Empty, string.Empty, type, firsubtype, string.Empty))
                 {
                     subtype1 += it.SRVNo + ":" + it.SRVName + ";";
                     row1++;
@@ -1744,7 +1728,7 @@ namespace project.Presentation.Op
             {
                 int row = 0;
                 Business.Base.BusinessService bt = new Business.Base.BusinessService();
-                foreach (Entity.Base.EntityService it in bt.GetListQuery(string.Empty, string.Empty, string.Empty, type, string.Empty, string.Empty, string.Empty))
+                foreach (Entity.Base.EntityService it in bt.GetListQuery(string.Empty, string.Empty, string.Empty, type, string.Empty))
                 {
                     subtype += it.SRVNo + ":" + it.SRVName + ";";
                     row++;
@@ -1774,7 +1758,7 @@ namespace project.Presentation.Op
                 bc.load(ODSRVNo);
                 if (bc.Entity.SRVRoundType.ToUpper() == "FLOOR") amount = Math.Floor(ODQTY * ODUnitPrice);
                 else if (bc.Entity.SRVRoundType.ToUpper() == "CEILING") amount = Math.Ceiling(ODQTY * ODUnitPrice);
-                else amount = Math.Round(ODQTY * ODUnitPrice, bc.Entity.SRVDecimalPoint);
+                else amount = Math.Round(ODQTY * ODUnitPrice, 2);
                 collection.Add(new JsonStringValue("amount", amount.ToString()));
             }
             catch { flag = "2"; }
@@ -1802,7 +1786,7 @@ namespace project.Presentation.Op
                 else if (bc.Entity.SRVRoundType.ToUpper() == "CEILING")
                     tax = Math.Ceiling(amount - Math.Round(amount / (1 + rate), 2));
                 else
-                    tax = Math.Round(amount - Math.Round(amount / (1 + rate), 2), bc.Entity.SRVDecimalPoint);
+                    tax = Math.Round(amount - Math.Round(amount / (1 + rate), 2), 2);
                 collection.Add(new JsonStringValue("tax", tax.ToString()));
             }
             catch { flag = "2"; }
@@ -1827,8 +1811,8 @@ namespace project.Presentation.Op
                 decimal tax = 0;
                 Business.Base.BusinessService bc = new Business.Base.BusinessService();
                 bc.load(ODSRVNo);
-                decimal SRVRate = bc.Entity.SRVRate;
-                if (SRVRate <= 0) SRVRate = 0;
+                //decimal SRVRate = bc.Entity.SRVRate;
+                //if (SRVRate <= 0) SRVRate = 0;
 
                 if (bc.Entity.SRVRoundType.ToUpper() == "FLOOR")
                 {
@@ -1842,8 +1826,8 @@ namespace project.Presentation.Op
                 }
                 else
                 {
-                    total = Math.Round(ODQTY * ODUnitPrice, bc.Entity.SRVDecimalPoint);
-                    tax = Math.Round(total - Math.Round(total / (1 + ODTaxRate), 2), bc.Entity.SRVDecimalPoint);
+                    total = Math.Round(ODQTY * ODUnitPrice, 2);
+                    tax = Math.Round(total - Math.Round(total / (1 + ODTaxRate), 2), 2);
                 }
 
                 collection.Add(new JsonStringValue("total", total.ToString()));

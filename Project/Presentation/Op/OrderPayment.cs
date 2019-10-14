@@ -70,7 +70,7 @@ namespace project.Presentation.Op
                         ODSRVNoStr = "<select class=\"input-text size-MINI\" id=\"ODSRVNo\">";
                         ODSRVNoStr += "<option value=\"\"></option>";
                         Business.Base.BusinessService bc2 = new project.Business.Base.BusinessService();
-                        foreach (Entity.Base.EntityService it in bc2.GetListQuery(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty))
+                        foreach (Entity.Base.EntityService it in bc2.GetListQuery(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty))
                         {
                             ODSRVNoStr += "<option value='" + it.SRVNo + "'>" + it.SRVName + "</option>";
                         }
@@ -571,9 +571,9 @@ namespace project.Presentation.Op
                         }
                         if (cnt == 0 && it.ODARAmount > 0)
                         {
-                            DataTable dt1 = obj.PopulateDataSet("select APNo from Mstr_ChargeAccount where CANo='" + it.ODCANo + "'").Tables[0];
+                            DataTable dt1 = obj.PopulateDataSet("SELECT SRVFinanceReceivableCode FROM Mstr_Service WHERE SRVFinanceFeeCode='" + it.ODCANo + "'").Tables[0];
                             if (dt1.Rows.Count > 0)
-                                JFSubject = dt1.Rows[0]["APNo"].ToString();
+                                JFSubject = dt1.Rows[0]["SRVFinanceReceivableCode"].ToString();
 
                             SPNo = it.ODContractSPNo;
 
@@ -678,7 +678,7 @@ namespace project.Presentation.Op
                         U8Return ot = new U8Return();
                         object oj = JsonToObject(result, ot);
                         U8Msg msg = ((U8Return)oj).rtn[0];
-                        if (msg.flag == "True")
+                        if (msg.flag == "1")
                         {
                             collection.Add(new JsonStringValue("liststr", createList(jp.getValue("OrderNoS"), jp.getValue("OrderTypeS"), jp.getValue("CustNoS"),
                                 jp.getValue("OrderTimeS"), jp.getValue("MinOrderCreateDate"), jp.getValue("MaxOrderCreateDate"), jp.getValue("OrderStatusS"), jp.getValue("SPNo"), ParseIntForString(jp.getValue("page")))));

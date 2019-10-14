@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" Inherits="project.Presentation.main,project" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" Inherits="project.Presentation.main,project" Async="true" %>
 <!DOCTYPE HTML>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head id="Head1" runat="server">

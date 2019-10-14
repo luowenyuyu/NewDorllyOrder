@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Data;
 using System.Net.Json;
 using System.Web;
@@ -139,7 +140,6 @@ namespace project.Presentation.Op
                         SRVNo4Str = "<select class=\"input-text size-MINI\" id=\"SRVNo4\">";
                         SRVNo4Str += "<option value='" + setting.Entity.SRVNo + "'>" + setting.Entity.SRVName + "</option>";
                         SRVNo4Str += "</select>";
-
                         setting.load("WPPTSPNO");
                         PTSPNo = setting.Entity.StringValue;
                     }
@@ -934,61 +934,41 @@ namespace project.Presentation.Op
                 }
                 else
                 {
+                    string msg = string.Empty;
                     if (bc.Entity.ContractStatus == "1")
                     {
+                        //合同审核
                         bc.Entity.ContractStatus = "2";
-                        string InfoBar = bc.approve_WPPT(user.Entity.UserName);
-                        if (InfoBar != "")
+                        msg = bc.ContractReview("Contract_ReviewPT", bc.Entity.RowPointer, user.Entity.UserName);
+                        if (string.IsNullOrEmpty(msg))
                         {
-                            flag = "5";
-                            collection.Add(new JsonStringValue("InfoBar", InfoBar));
+                            //成功
+                            collection.Add(new JsonStringValue("status", bc.Entity.ContractStatus));
+                            collection.Add(new JsonStringValue("GJSync", bc.SyncButlerForCustStatus()));//同步到管家
                         }
                         else
                         {
-                            collection.Add(new JsonStringValue("status", bc.Entity.ContractStatus));
-                            #region 同步到管家
-                            try
-                            {
-                                ButlerSrv.AppService appService = new ButlerSrv.AppService { Timeout = 5000 };
-                                appService.UpdateCustomer(bc.Entity.ContractCustNo, "1", "");
-                            }
-                            catch (Exception ex)
-                            {
-                                collection.Add(new JsonStringValue("syncButlerException", ex.ToString()));
-                            }
-                            #endregion
-
+                            //失败
+                            flag = "5";
+                            collection.Add(new JsonStringValue("InfoBar", msg));
                         }
                     }
                     else
                     {
                         //取消审核
-                        string InfoBar = bc.CancelAudit(user.Entity.UserName);
-                        if (InfoBar != "")
+                        msg = bc.ContractCancel(bc.Entity.RowPointer, user.Entity.UserName);
+                        if (string.IsNullOrEmpty(msg))
                         {
-                            flag = "5";
-                            collection.Add(new JsonStringValue("InfoBar", InfoBar));
+                            //成功
+                            collection.Add(new JsonStringValue("status", "1"));
+                            collection.Add(new JsonStringValue("GJSync", bc.SyncButlerForCustStatus()));//同步到管家
                         }
                         else
                         {
-                            collection.Add(new JsonStringValue("status", "1"));
-                            #region 同步到管家
-                            try
-                            {
-                                string status = string.Empty;
-                                string date = string.Empty;
-                                bc.CheckCustStatus(out status, out date);
-                                ButlerSrv.AppService appService = new ButlerSrv.AppService { Timeout = 5000 };
-                                appService.UpdateCustomer(bc.Entity.ContractCustNo, status, date);
-                            }
-                            catch (Exception ex)
-                            {
-                                collection.Add(new JsonStringValue("syncButlerException", ex.ToString()));
-                            }
-                            #endregion
+                            //失败
+                            flag = "5";
+                            collection.Add(new JsonStringValue("InfoBar", msg));
                         }
-
-
                     }
                 }
             }

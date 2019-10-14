@@ -10,7 +10,7 @@ namespace project.Business.Base
     public sealed class BusinessLateFee : project.Business.AbstractPmBusiness
     {
         private project.Entity.Base.EntityLateFee _entity = new project.Entity.Base.EntityLateFee();
-        public string OrderField = "CreateDate";
+        public string OrderField = "a.SPNo,a.CreateDate";
         Data objdata = new Data();
 
         /// <summary>
@@ -40,11 +40,14 @@ namespace project.Business.Base
         /// </summary>
         public void load(string id)
         {
-            DataRow dr = objdata.PopulateDataSet("select a.*,b.SRVName,c.SRVName as LateFeeSRVName from Mstr_LateFee a " +
+            DataRow dr = objdata.PopulateDataSet("select a.*,b.SRVName,c.SRVName as LateFeeSRVName,d.SPShortName from Mstr_LateFee a " +
                 "left join Mstr_Service b on a.SRVNo=b.SRVNo " +
                 "left join Mstr_Service c on a.LateFeeSRVNo=c.SRVNo " +
+                "left join Mstr_ServiceProvider d on a.SPNo=d.SPNo " +
                 "where RowPointer='" + id + "'").Tables[0].Rows[0];
             _entity.RowPointer = dr["RowPointer"].ToString();
+            _entity.SPNo = dr["SPNo"].ToString();
+            _entity.SPShortName = dr["SPShortName"].ToString();
             _entity.SRVNo = dr["SRVNo"].ToString();
             _entity.SRVName = dr["SRVName"].ToString();
             _entity.LateFeeSRVNo = dr["LateFeeSRVNo"].ToString();
@@ -62,14 +65,15 @@ namespace project.Business.Base
         {
             string sqlstr = "";
             if (Entity.RowPointer == null)
-                sqlstr = "insert into Mstr_LateFee(RowPointer,SRVNo,LateFeeSRVNo,CreateUser,CreateDate,UpdateUser,UpdateDate)" +
-                    "values(NEWID()," + "'" + Entity.SRVNo + "'" + "," +
+                sqlstr = "insert into Mstr_LateFee(RowPointer,SPNo,SRVNo,LateFeeSRVNo,CreateUser,CreateDate,UpdateUser,UpdateDate)" +
+                    "values(NEWID()," + "'" + Entity.SPNo + "'" + "," + "'" + Entity.SRVNo + "'" + "," +
                     "'" + Entity.LateFeeSRVNo + "'" + "," +
-                    "'" + Entity.CreateUser + "'" + ","+"'" + Entity.CreateDate.ToString("yyyy-MM-dd HH:mm:ss") + "'" + "," +
+                    "'" + Entity.CreateUser + "'" + "," + "'" + Entity.CreateDate.ToString("yyyy-MM-dd HH:mm:ss") + "'" + "," +
                     "'" + Entity.UpdateUser + "'" + "," + "'" + Entity.UpdateDate.ToString("yyyy-MM-dd HH:mm:ss") + "'" + ")";
             else
                 sqlstr = "update Mstr_LateFee" +
                     " set SRVNo=" + "'" + Entity.SRVNo + "'" + "," +
+                    "SPNo='" + Entity.SPNo + "'" + "," +
                     "LateFeeSRVNo=" + "'" + Entity.LateFeeSRVNo + "'" + "," +
                     "UpdateUser=" + "'" + Entity.UpdateUser + "'" + "," +
                     "UpdateDate=" + "'" + Entity.UpdateDate.ToString("yyyy-MM-dd HH:mm:ss") + "'" +
@@ -90,14 +94,14 @@ namespace project.Business.Base
         /// </summary>
         /// <param name="SRVNo">费用项目</param>
         /// <returns></returns>
-        public System.Collections.ICollection GetListQuery(string SRVNo, int startRow, int pageSize)
+        public System.Collections.ICollection GetListQuery(string SPNo, string SRVNo, string SRVName, string LateSRVName, int startRow, int pageSize)
         {
             if (startRow < 0 || pageSize <= 0)
             {
                 throw new Exception();
             }
 
-            return GetListHelper(SRVNo, startRow, pageSize);
+            return GetListHelper(SPNo, SRVNo, SRVName, LateSRVName, startRow, pageSize);
         }
 
         /// <summary>
@@ -105,9 +109,9 @@ namespace project.Business.Base
         /// </summary>
         /// <param name="SRVNo">费用项目</param>
         /// <returns></returns>
-        public System.Collections.ICollection GetListQuery(string SRVNo)
+        public System.Collections.ICollection GetListQuery(string SPNo, string SRVNo, string SRVName, string LateSRVName)
         {
-            return GetListHelper(SRVNo, START_ROW_INIT, START_ROW_INIT);
+            return GetListHelper(SPNo, SRVNo, SRVName, LateSRVName, START_ROW_INIT, START_ROW_INIT);
         }
 
         /// <summary>
@@ -115,15 +119,28 @@ namespace project.Business.Base
         /// </summary>
         /// <param name="SRVNo">费用项目</param>
         /// <returns></returns>
-        public int GetListCount(string SRVNo)
+        public int GetListCount(string SPNo, string SRVNo, string SRVName, string LateSRVName)
         {
             string wherestr = "";
-            if (SRVNo != string.Empty)
+            if (!string.IsNullOrEmpty(SPNo))
             {
-                wherestr = wherestr + " and SRVNo = '" + SRVNo + "'";
+                wherestr = wherestr + " and a.SPNo = '" + SPNo + "' ";
             }
-
-            string count = objdata.PopulateDataSet("select count(*) as cnt from Mstr_LateFee where 1=1 " + wherestr).Tables[0].Rows[0]["cnt"].ToString();
+            if (!string.IsNullOrEmpty(SRVNo))
+            {
+                wherestr = wherestr + " and a.SRVNo = '" + SRVNo + "' ";
+            }
+            if (!string.IsNullOrEmpty(SRVName))
+            {
+                wherestr = wherestr + " and b.SRVName like '%" + SRVName + "%' ";
+            }
+            if (!string.IsNullOrEmpty(LateSRVName))
+            {
+                wherestr = wherestr + " and c.SRVName  like '%" + LateSRVName + "%' ";
+            }
+            string sql = string.Format(@"select count(*) as cnt from Mstr_LateFee a left join Mstr_Service b on a.SRVNo=b.SRVNo  
+            left join Mstr_Service c on a.LateFeeSRVNo=c.SRVNo left join Mstr_ServiceProvider d on a.SPNo=d.SPNo where 1=1 ");
+            string count = objdata.PopulateDataSet(sql + wherestr).Tables[0].Rows[0]["cnt"].ToString();
             return int.Parse(count);
         }
 
@@ -132,26 +149,39 @@ namespace project.Business.Base
         /// </summary>
         /// <param name="SRVNo">费用项目</param>
         /// <returns></returns>
-        private System.Collections.ICollection GetListHelper(string SRVNo, int startRow, int pageSize)
+        private System.Collections.ICollection GetListHelper(string SPNo, string SRVNo, string SRVName, string LateSRVName, int startRow, int pageSize)
         {
             string wherestr = "";
-            if (SRVNo != string.Empty)
+            if (!string.IsNullOrEmpty(SPNo))
             {
-                wherestr = wherestr + " and SRVNo = '" + SRVNo + "'";
+                wherestr = wherestr + " and a.SPNo = '" + SPNo + "' ";
             }
+            if (!string.IsNullOrEmpty(SRVNo))
+            {
+                wherestr = wherestr + " and a.SRVNo = '" + SRVNo + "' ";
+            }
+            if (!string.IsNullOrEmpty(SRVName))
+            {
+                wherestr = wherestr + " and b.SRVName like '%" + SRVName + "%' ";
+            }
+            if (!string.IsNullOrEmpty(LateSRVName))
+            {
+                wherestr = wherestr + " and c.SRVName  like '%" + LateSRVName + "%' ";
+            }
+
 
             System.Collections.IList entitys = null;
             if (startRow > START_ROW_INIT && pageSize > START_ROW_INIT)
             {
                 entitys = Query(objdata.ExecSelect("Mstr_LateFee a left join Mstr_Service b on a.SRVNo=b.SRVNo " +
-                    "left join Mstr_Service c on a.LateFeeSRVNo=c.SRVNo",
-                    "a.*,b.SRVName,c.SRVName as LateFeeSRVName", wherestr, startRow, pageSize, OrderField));
+                    "left join Mstr_Service c on a.LateFeeSRVNo=c.SRVNo left join Mstr_ServiceProvider d on a.SPNo=d.SPNo",
+                    "a.*,b.SRVName,c.SRVName as LateFeeSRVName,d.SPShortName", wherestr, startRow, pageSize, OrderField));
             }
             else
             {
                 entitys = Query(objdata.ExecSelect("Mstr_LateFee a left join Mstr_Service b on a.SRVNo=b.SRVNo " +
-                    "left join Mstr_Service c on a.LateFeeSRVNo=c.SRVNo",
-                    "a.*,b.SRVName,c.SRVName as LateFeeSRVName", wherestr, START_ROW_INIT, START_ROW_INIT, OrderField));
+                    "left join Mstr_Service c on a.LateFeeSRVNo=c.SRVNo left join Mstr_ServiceProvider d on a.SPNo=d.SPNo",
+                    "a.*,b.SRVName,c.SRVName as LateFeeSRVName,d.SPShortName", wherestr, START_ROW_INIT, START_ROW_INIT, OrderField));
             }
             return entitys;
         }
@@ -166,6 +196,8 @@ namespace project.Business.Base
             {
                 project.Entity.Base.EntityLateFee entity = new project.Entity.Base.EntityLateFee();
                 entity.RowPointer = dr["RowPointer"].ToString();
+                entity.SPNo = dr["SPNo"].ToString();
+                entity.SPShortName = dr["SPShortName"].ToString();
                 entity.SRVNo = dr["SRVNo"].ToString();
                 entity.SRVName = dr["SRVName"].ToString();
                 entity.LateFeeSRVNo = dr["LateFeeSRVNo"].ToString();

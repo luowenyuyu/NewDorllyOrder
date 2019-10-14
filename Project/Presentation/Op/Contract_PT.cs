@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Data;
 using System.Net.Json;
 using System.Web;
@@ -664,12 +665,14 @@ namespace project.Presentation.Op
                 sb.Append("<thead>");
                 sb.Append("<tr class=\"text-c\">");
                 sb.Append("<th style=\"width:5%\">序号</th>");
-                sb.Append("<th style=\"width:15%\">费用项目</th>");
-                sb.Append("<th style=\"width:32%\">房屋编号</th>");
+                sb.Append("<th style=\"width:28%\">资源编号</th>");
+                sb.Append("<th style=\"width:12%\">费用项目</th>");                
                 sb.Append("<th style=\"width:12%\">起始日期</th>");
                 sb.Append("<th style=\"width:12%\">截止日期</th>");
-                sb.Append("<th style=\"width:12%\">金额</th>");
-                sb.Append("<th style=\"width:12%\">是否生成订单</th>");
+                sb.Append("<th style=\"width:6%\">单价</th>");
+                sb.Append("<th style=\"width:6%\">数量</th>");
+                sb.Append("<th style=\"width:10%\">金额</th>");
+                sb.Append("<th style=\"width:12%\">订单状态</th>");
                 sb.Append("</tr>");
                 sb.Append("</thead>");
                 int r = 1;
@@ -679,10 +682,12 @@ namespace project.Presentation.Op
                 {
                     sb.Append("<tr class=\"text-c\" id=\"" + it.RowPointer + "\">");
                     sb.Append("<td align='center'>" + r.ToString() + "</td>");
-                    sb.Append("<td>" + it.SRVName + "</td>");
                     sb.Append("<td>" + it.RMID + "</td>");
+                    sb.Append("<td>" + it.SRVName + "</td>");                    
                     sb.Append("<td>" + ParseStringForDate(it.FeeStartDate) + "</td>");
                     sb.Append("<td>" + ParseStringForDate(it.FeeEndDate) + "</td>");
+                    sb.Append("<td>" + it.FeeUnitPrice.ToString("0.####") + "</td>");
+                    sb.Append("<td>" + it.FeeQty.ToString("0.####") + "</td>");
                     sb.Append("<td>" + it.FeeAmount.ToString("0.####") + "</td>");
                     sb.Append("<td><span style=\"color:" + (it.FeeStatus == "0" ? "red" : "blue") + ";\">" + (it.FeeStatus == "0" ? "未生成" : "已生成") + "</span></td>");
                     sb.Append("</tr>");
@@ -925,59 +930,40 @@ namespace project.Presentation.Op
                 }
                 else
                 {
+                    string msg = string.Empty;
                     if (bc.Entity.ContractStatus == "1")
                     {
+                        //合同审核
                         bc.Entity.ContractStatus = "2";
-                        string InfoBar = bc.approve_PT(user.Entity.UserName);
-                        if (InfoBar != "")
+                        msg = bc.ContractReview("Contract_ReviewPT", bc.Entity.RowPointer, user.Entity.UserName);
+                        if (string.IsNullOrEmpty(msg))
                         {
-                            flag = "5";
-                            collection.Add(new JsonStringValue("InfoBar", InfoBar));
+                            //成功
+                            collection.Add(new JsonStringValue("status", bc.Entity.ContractStatus));
+                            collection.Add(new JsonStringValue("GJSync", bc.SyncButlerForCustStatus()));//同步到管家
                         }
                         else
                         {
-                            #region 同步到管家
-                            try
-                            {
-                                ButlerSrv.AppService appService = new ButlerSrv.AppService { Timeout = 5000 };
-                                appService.UpdateCustomer(bc.Entity.ContractCustNo, "1", "");
-                            }
-                            catch (Exception ex)
-                            {
-                                collection.Add(new JsonStringValue("syncButlerException", ex.ToString()));
-                            }
-                            #endregion
-
-
+                            //失败
+                            flag = "5";
+                            collection.Add(new JsonStringValue("InfoBar", msg));
                         }
-                        collection.Add(new JsonStringValue("status", bc.Entity.ContractStatus));
                     }
                     else
                     {
                         //取消审核
-                        string InfoBar = bc.CancelAudit(user.Entity.UserName);
-                        if (InfoBar != "")
+                        msg = bc.ContractCancel(bc.Entity.RowPointer, user.Entity.UserName);
+                        if (string.IsNullOrEmpty(msg))
                         {
-                            flag = "5";
-                            collection.Add(new JsonStringValue("InfoBar", InfoBar));
+                            //成功
+                            collection.Add(new JsonStringValue("status", "1"));
+                            collection.Add(new JsonStringValue("GJSync", bc.SyncButlerForCustStatus()));//同步到管家
                         }
                         else
                         {
-                            collection.Add(new JsonStringValue("status", "1"));
-                            #region 同步到管家
-                            try
-                            {
-                                string status = string.Empty;
-                                string date = string.Empty;
-                                bc.CheckCustStatus(out status, out date);
-                                ButlerSrv.AppService appService = new ButlerSrv.AppService { Timeout = 5000 };
-                                appService.UpdateCustomer(bc.Entity.ContractCustNo, status, date);
-                            }
-                            catch (Exception ex)
-                            {
-                                collection.Add(new JsonStringValue("syncButlerException", ex.ToString()));
-                            }
-                            #endregion
+                            //失败
+                            flag = "5";
+                            collection.Add(new JsonStringValue("InfoBar", msg));
                         }
                     }
                 }

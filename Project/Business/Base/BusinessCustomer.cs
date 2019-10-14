@@ -1,5 +1,11 @@
 ﻿using System;
+using System.Configuration;
 using System.Data;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+using project.ButlerSrv;
+using project.WOService;
+
 namespace project.Business.Base
 {
     /// <summary>
@@ -76,7 +82,7 @@ namespace project.Business.Base
                     "'" + Entity.RepIDCard + "'" + "," + "'" + Entity.CustContact + "'" + "," + "'" + Entity.CustTel + "'" + "," +
                     "'" + Entity.CustContactMobile + "'" + "," + "'" + Entity.CustEmail + "'" + "," + "'" + Entity.CustBankTitle + "'" + "," +
                     "'" + Entity.CustBankAccount + "'" + "," + "'" + Entity.CustBank + "'" + "," + "'3'" + "," +
-                    "'" + Entity.CustCreateDate.ToString("yyyy-MM-dd HH:mm:ss") + "'" + ",'" + Entity.CustCreator + "'," + (Entity.IsExternal ? "1" : "0") + ")";
+                    "'" + Entity.CustCreateDate.ToString("yyyy-MM-dd HH:mm:ss") + "'" + ",'" + Entity.CustCreator + "','" + (Entity.IsExternal ? "1" : "0") + "'"+ ")";
             else
                 sqlstr = "update Mstr_Customer" +
                     " set CustName=" + "'" + Entity.CustName + "'" + "," + "CustShortName=" + "'" + Entity.CustShortName + "'" + "," +
@@ -234,5 +240,192 @@ namespace project.Business.Base
             }
             return result;
         }
+
+        #region 数据同步
+
+        public bool DataOpration(string opration, string userName,out string msg)
+        {
+            bool success = true;
+            msg = string.Empty;
+            try
+            {
+                bool cssync = ConfigurationManager.AppSettings["IsPutKH"].ToString().Equals("Y");
+                BusinessCustomer bc = null;
+                if (opration.Equals("update"))
+                {
+                    bc = new BusinessCustomer();
+                    bc.load(Entity.CustNo);
+                }
+                if (Save(opration) <= 0) throw new Exception("本地保存失败！");
+                //是否同步到客户系统
+                if (cssync)
+                {
+                    //同步到客户系统
+                    msg = CustomerSystemSync(opration);
+                    if (opration.Equals("insert"))
+                    {
+                        if (msg.Length > 3)
+                        {
+                            objdata.ExecuteNonQuery(string.Format(@"UPDATE Mstr_Customer 
+                                    SET CustNo='{0}' WHERE CustNo='{1}'", msg, Entity.CustNo));
+                        }
+                        else
+                        {
+                            delete();
+                            success = false;
+                        }
+                    }
+                    else
+                    {
+                        if (int.Parse(msg) <= 0)
+                        {
+                            bc.Save(opration);
+                            success = false;
+                        }
+                    }
+                }
+                else
+                {
+                    //不同步到客户系统
+                    ButlerSync(opration, userName);
+                    WOSync(opration, userName);
+                }
+            }
+            catch (Exception ex)
+            {
+                msg = ex.ToString();
+                success = false;
+            }
+            return success;
+        }
+
+        /*
+        * #################################    客户系统    #########################################
+        */
+        public string CustomerSystemSync(string opration)
+        {
+            string result = string.Empty;
+            try
+            {
+                if (ConfigurationManager.AppSettings["IsPutKH"].ToString().Equals("Y"))
+                {
+                    CustSystem.CustomerSync service = new CustSystem.CustomerSync
+                    {
+                        Timeout = 5000,
+                        Url = ConfigurationManager.AppSettings["CustUrl"].ToString()
+                    };
+                    //var customerInfo = JsonConvert.DeserializeObject<CustSystem.CustomerInfo>(JsonConvert.SerializeObject(this.Entity));         
+                    var customerInfo = new CustSystem.CustomerInfo();
+                    customerInfo.CustName = this.Entity.CustName;
+                    customerInfo.CustShortName = this.Entity.CustShortName;
+                    customerInfo.CustType = this.Entity.CustType;
+                    customerInfo.Representative = this.Entity.Representative;
+                    customerInfo.BusinessScope = this.Entity.BusinessScope;
+                    customerInfo.CustLicenseNO = this.Entity.CustLicenseNo;
+                    customerInfo.RepIDCard = this.Entity.RepIDCard;
+                    customerInfo.CustContact = this.Entity.CustContact;
+                    customerInfo.CustTel = this.Entity.CustTel;
+                    customerInfo.CustContactMobile = this.Entity.CustContactMobile;
+                    customerInfo.CustEmail = this.Entity.CustEmail;
+                    customerInfo.CustBankTitle = this.Entity.CustBankTitle;
+                    customerInfo.CustBankAccount = this.Entity.CustBankAccount;
+                    customerInfo.CustBank = this.Entity.CustBank;
+                    customerInfo.CustStatus = this.Entity.CustStatus;
+                    customerInfo.CustCreateDate = this.Entity.CustCreateDate;
+                    customerInfo.CustCreator = this.Entity.CustCreator;
+                    customerInfo.IsExternal =Convert.ToInt16(this.Entity.IsExternal);
+                    customerInfo.CustIdOnCenterServer = this.Entity.CustNo;
+                    customerInfo.ParkNo = ConfigurationManager.AppSettings["ParkNo"].ToString();
+                    customerInfo.SourceSystem_ShortName = ConfigurationManager.AppSettings["SourceSystem_ShortName"].ToString();
+                    customerInfo.SoftwareInstance_ShortName = ConfigurationManager.AppSettings["SoftwareInstance_ShortName"].ToString();
+                    if (opration.Equals("insert"))
+                    {
+                        result = service.CustomerInsert(customerInfo);
+                    }
+                    else
+                    {
+                        result = service.CustomerUpdate(customerInfo).ToString();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return result;
+        }
+        /*
+         * #################################    艾众管家    #########################################
+         */
+        public void ButlerSync(string opration, string userName)
+        {
+            try
+            {
+                if (ConfigurationManager.AppSettings["IsPutGJ"].ToString().Equals("Y"))
+                {
+                    ButlerSrv.AppService service = new ButlerSrv.AppService
+                    {
+                        Timeout = 5000,
+                        Url = ConfigurationManager.AppSettings["ButlerUrl"].ToString()
+                    };
+                    if (opration.Equals("insert"))
+                    {
+                        service.SetCustomer(Entity.CustNo, Entity.CustName, Entity.CustShortName, Entity.CustType, Entity.Representative,
+                                        Entity.BusinessScope, Entity.CustLicenseNo, Entity.RepIDCard, Entity.CustContact, Entity.CustTel,
+                                        Entity.CustContactMobile, Entity.CustEmail, Entity.CustBankTitle, Entity.CustBankAccount, Entity.CustBank,
+                                        Entity.IsExternal, userName, "insert", "5218E3ED752A49D4");
+                    }
+                    else
+                    {
+                        service.SetCustomer(Entity.CustNo, Entity.CustName, Entity.CustShortName, Entity.CustType, Entity.Representative,
+                                      Entity.BusinessScope, Entity.CustLicenseNo, Entity.RepIDCard, Entity.CustContact, Entity.CustTel,
+                                      Entity.CustContactMobile, Entity.CustEmail, Entity.CustBankTitle, Entity.CustBankAccount, Entity.CustBank,
+                                      Entity.IsExternal, userName, "update", "5218E3ED752A49D4");
+                    }
+                }
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+        /*
+        * #################################    工单系统    #########################################
+        */
+
+        public void WOSync(string opration, string userName)
+        {
+            try
+            {
+                if (ConfigurationManager.AppSettings["IsPutGD"].ToString().Equals("Y"))
+                {
+                    WOService.WebService service = new WOService.WebService
+                    {
+                        Timeout = 5000,
+                        Url = ConfigurationManager.AppSettings["WOUrl"].ToString()
+                    };
+                    if (opration.Equals("insert"))
+                    {
+                        service.SetCustomer(Entity.CustNo, Entity.CustName, Entity.CustShortName, Entity.CustType, Entity.Representative,
+                                        Entity.BusinessScope, Entity.CustLicenseNo, Entity.RepIDCard, Entity.CustContact, Entity.CustTel,
+                                        Entity.CustContactMobile, Entity.CustEmail, Entity.CustBankTitle, Entity.CustBankAccount, Entity.CustBank,
+                                        Entity.IsExternal, userName, "insert", "5218E3ED752A49D4");
+                    }
+                    else
+                    {
+                        service.SetCustomer(Entity.CustNo, Entity.CustName, Entity.CustShortName, Entity.CustType, Entity.Representative,
+                                      Entity.BusinessScope, Entity.CustLicenseNo, Entity.RepIDCard, Entity.CustContact, Entity.CustTel,
+                                      Entity.CustContactMobile, Entity.CustEmail, Entity.CustBankTitle, Entity.CustBankAccount, Entity.CustBank,
+                                      Entity.IsExternal, userName, "update", "5218E3ED752A49D4");
+                    }
+                }
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+        #endregion
+
     }
 }

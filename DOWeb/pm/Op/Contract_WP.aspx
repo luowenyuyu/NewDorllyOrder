@@ -93,11 +93,11 @@
                     <td class="tdr"><%=ContractSPNoStr %></td>
                     <td class="tdl">客户</td>
                     <td class="tdr" colspan="3">
-                        <input type="text" class="input-text size-MINI" id="ContractCustName" onblur="checkcust()" style="width:400px" />
+                        <input type="text" class="input-text size-MINI" id="ContractCustName" onblur="checkcust()" style="width: 400px" />
                         <input type="hidden" id="ContractCustNo" />
-                        <img id="ContractCustImg" alt="" src="../../images/view_detail.png" class="view_detail" style="padding-left:5px" />
+                        <img id="ContractCustImg" alt="" src="../../images/view_detail.png" class="view_detail" style="padding-left: 5px" />
                     </td>
-<%--                    <td class="tdl"></td>
+                    <%--                    <td class="tdl"></td>
                     <td class="tdr"></td>--%>
                 </tr>
                 <tr>
@@ -138,55 +138,69 @@
                     <td class="tdl">工位押金</td>
                     <td class="tdr">
                         <input type="text" id="WPRentalDeposit" class="input-text size-MINI" onchange="validDecimal(this.id)" /></td>
-                    
+
                     <td class="tdl"></td>
                     <td class="tdr"></td>
                 </tr>
-                
-                              
-                    <tr style="display:none;">
+
+
+                <tr style="display: none;">
                     <td class="tdl">房屋押金</td>
-                    <td class="tdr"><input type="text" id="RMRentalDeposit" class="input-text size-MINI" onchange="validDecimal(this.id)" /></td>
+                    <td class="tdr">
+                        <input type="text" id="RMRentalDeposit" class="input-text size-MINI" onchange="validDecimal(this.id)" /></td>
                     <td class="tdl">房屋水电押金</td>
-                    <td class="tdr"><input type="text" id="RMUtilityDeposit" class="input-text size-MINI" onchange="validDecimal(this.id)" /></td>
+                    <td class="tdr">
+                        <input type="text" id="RMUtilityDeposit" class="input-text size-MINI" onchange="validDecimal(this.id)" /></td>
                     <td class="tdl">广告位数量</td>
-                    <td class="tdr"><input type="text" id="BBQTY" class="input-text size-MINI" disabled="disabled" onchange="validInt(this.id)" /></td>
+                    <td class="tdr">
+                        <input type="text" id="BBQTY" class="input-text size-MINI" disabled="disabled" onchange="validInt(this.id)" /></td>
                     <td class="tdl">广告位合同总金额</td>
-                    <td class="tdr"><input type="text" id="BBAmount" class="input-text size-MINI" disabled="disabled" onchange="validDecimal(this.id)" /></td>
+                    <td class="tdr">
+                        <input type="text" id="BBAmount" class="input-text size-MINI" disabled="disabled" onchange="validDecimal(this.id)" /></td>
                 </tr>
-                <tr style="display:none;">
+                <tr style="display: none;">
                     <td class="tdl">管理费起收日期</td>
-                    <td class="tdr"><input type="text" id="PropertyFeeStartDate" class="input-text size-MINI" /></td>
+                    <td class="tdr">
+                        <input type="text" id="PropertyFeeStartDate" class="input-text size-MINI" /></td>
                     <td class="tdl">管理费减免开始日期</td>
-                    <td class="tdr"><input type="text" id="PropertyFeeReduceStartDate" class="input-text size-MINI" /></td>
+                    <td class="tdr">
+                        <input type="text" id="PropertyFeeReduceStartDate" class="input-text size-MINI" /></td>
                     <td class="tdl">管理费减免结束日期</td>
-                    <td class="tdr"><input type="text" id="PropertyFeeReduceEndDate" class="input-text size-MINI" /></td>
+                    <td class="tdr">
+                        <input type="text" id="PropertyFeeReduceEndDate" class="input-text size-MINI" /></td>
                     <td class="tdl"></td>
                     <td class="tdr"></td>
                 </tr>
-                 <tr style="display:none;">
+                <tr style="display: none;">
                     <td class="tdl">水费单价</td>
-                    <td class="tdr"><input type="text" id="WaterUnitPrice" class="input-text size-MINI" onchange="validDecimal(this.id)" /></td>
+                    <td class="tdr">
+                        <input type="text" id="WaterUnitPrice" class="input-text size-MINI" onchange="validDecimal(this.id)" /></td>
                     <td class="tdl">电费单价</td>
-                    <td class="tdr"><input type="text" id="ElecticityUintPrice" class="input-text size-MINI" onchange="validDecimal(this.id)" /></td>
+                    <td class="tdr">
+                        <input type="text" id="ElecticityUintPrice" class="input-text size-MINI" onchange="validDecimal(this.id)" /></td>
                     <td class="tdl">空调费单价</td>
-                    <td class="tdr"><input type="text" id="AirconUnitPrice" class="input-text size-MINI" onchange="validDecimal(this.id)" /></td>
+                    <td class="tdr">
+                        <input type="text" id="AirconUnitPrice" class="input-text size-MINI" onchange="validDecimal(this.id)" /></td>
                     <td class="tdl">管理费单价</td>
-                    <td class="tdr"><input type="text" id="PropertyUnitPrice" class="input-text size-MINI" onchange="validDecimal(this.id)" /></td>
+                    <td class="tdr">
+                        <input type="text" id="PropertyUnitPrice" class="input-text size-MINI" onchange="validDecimal(this.id)" /></td>
                 </tr>
-                <tr style="display:none;">
+                <tr style="display: none;">
                     <td class="tdl">公摊水费</td>
-                    <td class="tdr"><input type="text" id="SharedWaterFee" class="input-text size-MINI" onchange="validDecimal(this.id)" /></td>
+                    <td class="tdr">
+                        <input type="text" id="SharedWaterFee" class="input-text size-MINI" onchange="validDecimal(this.id)" /></td>
                     <td class="tdl">公摊电费</td>
-                    <td class="tdr"><input type="text" id="SharedElectricyFee" class="input-text size-MINI" onchange="validDecimal(this.id)" /></td>
+                    <td class="tdr">
+                        <input type="text" id="SharedElectricyFee" class="input-text size-MINI" onchange="validDecimal(this.id)" /></td>
                     <td class="tdl"></td>
                     <td class="tdr"></td>
                     <td class="tdl">工位电费押金</td>
-                    <td class="tdr"><input type="text" id="WPUtilityDeposit" class="input-text size-MINI" onchange="validDecimal(this.id)" /></td>
+                    <td class="tdr">
+                        <input type="text" id="WPUtilityDeposit" class="input-text size-MINI" onchange="validDecimal(this.id)" /></td>
                 </tr>
-                
-                
-                <tr style="display:none;">
+
+
+                <tr style="display: none;">
                     <td class="tdl">工位数量</td>
                     <td class="tdr">
                         <input type="text" id="WPQTY" class="input-text size-MINI" onchange="validInt(this.id)" /></td>
@@ -231,7 +245,7 @@
                 <tr>
                     <td class="tdl">是否按照固定金额</td>
                     <td class="tdr">
-                        <input type="checkbox" id="IsFixedAmt" class="input-text size-MINI" style="width: 30px;" title="请勾选"/></td>
+                        <input type="checkbox" id="IsFixedAmt" class="input-text size-MINI" style="width: 30px;" title="请勾选" /></td>
                     <td class="tdl">固定金额</td>
                     <td class="tdr">
                         <input type="text" id="Amount" class="input-text size-MINI" onchange="validDecimal(this.id)" /></td>
@@ -242,7 +256,7 @@
                             <option value="2">按固定金额递增</option>
                         </select>
                     </td>
-                     <td class="tdl"></td>
+                    <td class="tdl"></td>
                     <td class="tdr"></td>
                 </tr>
                 <tr>
@@ -295,7 +309,7 @@
                     <td class="tdl1">房屋编号</td>
                     <td class="tdr1">
                         <input type="text" class="input-text size-MINI" id="RMID2" disabled="disabled" style="width: 70%;" />
-                        <button type="button" class="btn btn-primary radius" id="chooseRMID2" >选择</button>
+                        <button type="button" class="btn btn-primary radius" id="chooseRMID2">选择</button>
                     </td>
                     <td class="tdl1">工位编号</td>
                     <td class="tdr1">
@@ -303,7 +317,10 @@
                         <button type="button" class="btn btn-primary radius" id="chooseWPNo">选择</button>
                     </td>
                     <td class="tdl1">费用项目</td>
-                    <td class="tdr1"><%=SRVNo2Str %></td>
+                    <td class="tdr1">
+                        <select class="input-text size-MINI" id="SRVNo2" data-provider="">
+                        </select>
+                    </td>
                 </tr>
                 <tr>
                     <td class="tdl1">工位数量</td>
@@ -398,7 +415,7 @@
                     copyid = "";
                     $("#ContractNo").val("");
                     $("#ContractType").val("02");
-                    $("#ContractSPNo").val("<%=WPSPNo %>");
+                    $("#ContractSPNo").val("");
                     $("#ContractSPName").val("");
                     $("#ContractCustNo").val("");
                     $("#ContractCustName").val("");
@@ -500,12 +517,12 @@
                     if (vjson.status == "1") {
                         $("#" + vjson.id + " td").eq(7).html("<label style=\"color:red;\">制单</label>");
                         layer.alert("取消审核成功！");
-                        console.log(vjson.sync);
+                        console.log(vjson.ZYSync);
                     }
                     else {
                         $("#" + vjson.id + " td").eq(7).html("<label style=\"color:blue;\">已审核</label>");
                         layer.alert("审核成功！");
-                        console.log(vjson.sync);
+                        console.log(vjson.ZYSync);
                     }
                 }
                 else if (vjson.flag == "3") {
@@ -891,6 +908,16 @@
                 else {
                     layer.alert("获取数据出错！");
                 }
+                return;
+            }
+            if (vjson.type == "getFeeSubject") {
+                //if (vjson.flag == "1") {
+                //    $("#WPRentalUnitPrice").val(vjson.UnitPrice);
+                //}
+                //else {
+                //    layer.alert("获取数据出错！");
+                //}
+                $("#SRVNo2").empty().append(vjson.result);
                 return;
             }
         }
@@ -1380,9 +1407,9 @@
             itemid2 = "";
             $("#RMID2").val("");
             $("#WPNo").val("");
-            $("#SRVNo2").val("<%=WPRentSRVNo %>");
+            $("#SRVNo2").val("");
             $("#WPQTY2").val("");
-            $("#WPRentalUnitPrice").val("<%=WPRentFee %>");
+            $("#WPRentalUnitPrice").val("");
             $("#RMLoc2").val("");
             $("#Remark2").val("");
         }
@@ -1410,11 +1437,13 @@
             transmitData(datatostr(submitData));
             return;
         }
+
         $("#SRVNo2").change(function () {
-            var submitData = new Object();
-            submitData.Type = "getprice2";
-            submitData.SRVNo = $("#SRVNo2").val();
-            transmitData(datatostr(submitData));
+            //var submitData = new Object();
+            //submitData.Type = "getprice2";
+            //submitData.SRVNo = $("#SRVNo2").val();
+            //transmitData(datatostr(submitData));
+            $("#WPRentalUnitPrice").val($("#SRVNo2 option:selected").attr("data-price"));
         });
 
         function show(page) {
@@ -1439,8 +1468,19 @@
                 if (page == "3") {
                     $('#itemtab3').addClass("selected");
                     $("#bodyeditdiv2").show();
+                    if ($("#SRVNo2").attr("data-provider") != $("#ContractSPNo").val()) {
+                        $("#SRVNo2").attr("data-provider", $("#ContractSPNo").val());
+                        getFeeSubject();
+                    }
                 }
             }
+        }
+
+        function getFeeSubject() {
+            var submitData = new Object();
+            submitData.Type = "getFeeSubject";
+            submitData.SPNo = $("#ContractSPNo").val();
+            transmitData(datatostr(submitData));
         }
 
         $("#ContractCustImg").click(function () {
@@ -1460,7 +1500,7 @@
             var temp = "../Base/ChooseWPNo.aspx?id=WPNo&RMID=" + $("#RMID2").val();
             layer_show("选择页面", temp, 800, 600);
         });
-        $("#Amount").bind("input propertychange change", function (event) {    
+        $("#Amount").bind("input propertychange change", function (event) {
             $("#IncreaseRate1").val($("#Amount").val());
             $("#IncreaseRate2").val($("#Amount").val());
             $("#IncreaseRate3").val($("#Amount").val());
@@ -1534,9 +1574,9 @@
         }
 
         jQuery(function () {
-           
-                $("#Amount").attr("disabled", "disabled");
-            
+
+            $("#Amount").attr("disabled", "disabled");
+
             var ContractSignedDate = new JsInputDate("ContractSignedDate");
             ContractSignedDate.setDisabled(false);
             ContractSignedDate.setWidth("130px");

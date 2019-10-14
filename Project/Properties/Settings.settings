@@ -14,5 +14,8 @@
     <Setting Name="project_ResourceService_ResourceService" Type="(Web Service URL)" Scope="Application">
       <Value Profile="(Default)">http://zy.dorlly.com/webapi/resourceservice.asmx</Value>
     </Setting>
+    <Setting Name="project_CustSystem_CustomerSync" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://sync.sesky.cn/CustomerSync.asmx</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

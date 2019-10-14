@@ -54,7 +54,7 @@ namespace project.Presentation.Base
                             Buttons += "<a href=\"javascript:;\" onclick=\"del()\" class=\"btn btn-danger radius\"><i class=\"Hui-iconfont\">&#xe6e2;</i> 删除</a>&nbsp;&nbsp;";
                         }
 
-                        list = createList(string.Empty, string.Empty, string.Empty, string.Empty,1);
+                        list = createList(string.Empty, string.Empty, string.Empty, string.Empty, 1);
                     }
                 }
                 else
@@ -97,7 +97,7 @@ namespace project.Presentation.Base
             int r = 1;
             sb.Append("<tbody>");
             Business.Base.BusinessCustomer bc = new project.Business.Base.BusinessCustomer();
-            foreach (Entity.Base.EntityCustomer it in bc.GetListQuery(CustNo, CustName, CustType, CustStatus,page,pageSize))
+            foreach (Entity.Base.EntityCustomer it in bc.GetListQuery(CustNo, CustName, CustType, CustStatus, page, pageSize))
             {
                 sb.Append("<tr class=\"text-c\" id=\"" + it.CustNo + "\">");
                 sb.Append("<td style=\"text-align:center;\">" + r.ToString() + "</td>");
@@ -110,7 +110,7 @@ namespace project.Presentation.Base
                 sb.Append("<td>" + it.CustTel + "</td>");
                 sb.Append("<td>" + it.CustContactMobile + "</td>");
                 sb.Append("<td>" + it.CustEmail + "</td>");
-                sb.Append("<td class=\"td-status\"><span class=\"label " + (it.CustStatus=="1" ? "label-success" : "") + " radius\">" + it.CustStatusName + "</span></td>");
+                sb.Append("<td class=\"td-status\"><span class=\"label " + (it.CustStatus == "1" ? "label-success" : "") + " radius\">" + it.CustStatusName + "</span></td>");
                 sb.Append("</tr>");
                 r++;
             }
@@ -232,16 +232,16 @@ namespace project.Presentation.Base
                 //}
                 //else
                 //{
-                    int r = bc.delete();
-                    if (r <= 0)
-                        flag = "2";
+                int r = bc.delete();
+                if (r <= 0)
+                    flag = "2";
                 //}
             }
             catch { flag = "2"; }
 
             collection.Add(new JsonStringValue("type", "delete"));
             collection.Add(new JsonStringValue("flag", flag));
-            collection.Add(new JsonStringValue("liststr", createList(jp.getValue("CustNoS"), jp.getValue("CustNameS"), jp.getValue("CustTypeS"), jp.getValue("CustStatusS"),ParseIntForString(jp.getValue("page")))));
+            collection.Add(new JsonStringValue("liststr", createList(jp.getValue("CustNoS"), jp.getValue("CustNameS"), jp.getValue("CustTypeS"), jp.getValue("CustStatusS"), ParseIntForString(jp.getValue("page")))));
 
             return collection.ToString();
         }
@@ -249,6 +249,7 @@ namespace project.Presentation.Base
         {
             JsonObjectCollection collection = new JsonObjectCollection();
             string flag = "1";
+            string msg = "等待同步！";
             try
             {
                 Business.Base.BusinessCustomer bc = new project.Business.Base.BusinessCustomer();
@@ -269,32 +270,41 @@ namespace project.Presentation.Base
                     bc.Entity.CustBankTitle = jp.getValue("CustBankTitle");
                     bc.Entity.CustBankAccount = jp.getValue("CustBankAccount");
                     bc.Entity.CustBank = jp.getValue("CustBank");
-                    bc.Entity.IsExternal = (jp.getValue("IsExternal")=="1");
-                   
-                    int r = bc.Save("update");
+                    bc.Entity.IsExternal = (jp.getValue("IsExternal") == "1");
+                    if (!bc.DataOpration("update", user.Entity.UserName, out msg)) flag = "2";
+                    #region odk
+                    //int r = bc.Save("update");
+                    //if (r <= 0)
+                    //    flag = "2";
+                    //else
+                    //{
+                    //    try
+                    //    {
+                    //        //bc.ButlerSync("update", user.Entity.UserName);//管家
+                    //        //bc.WOSync("update", user.Entity.UserName);//工单
+                    //        //bc.CustomerSystemSync("update");//客户
+                    //        ////同步艾众管家
+                    //        //ButlerSrv.AppService service = new ButlerSrv.AppService();
+                    //        //service.SetCustomer(bc.Entity.CustNo, bc.Entity.CustName, bc.Entity.CustShortName, bc.Entity.CustType, bc.Entity.Representative,
+                    //        //    bc.Entity.BusinessScope, bc.Entity.CustLicenseNo, bc.Entity.RepIDCard, bc.Entity.CustContact, bc.Entity.CustTel,
+                    //        //    bc.Entity.CustContactMobile, bc.Entity.CustEmail, bc.Entity.CustBankTitle, bc.Entity.CustBankAccount, bc.Entity.CustBank, bc.Entity.IsExternal,
+                    //        //    user.Entity.UserName, "update", "5218E3ED752A49D4");
+                    //        ////同步工单
+                    //        //WOService.WebService service1 = new WOService.WebService();
+                    //        //service1.Url = wopath;
+                    //        //service1.SetCustomer(bc.Entity.CustNo, bc.Entity.CustName, bc.Entity.CustShortName, bc.Entity.CustType, bc.Entity.Representative,
+                    //        //    bc.Entity.BusinessScope, bc.Entity.CustLicenseNo, bc.Entity.RepIDCard, bc.Entity.CustContact, bc.Entity.CustTel,
+                    //        //    bc.Entity.CustContactMobile, bc.Entity.CustEmail, bc.Entity.CustBankTitle, bc.Entity.CustBankAccount, bc.Entity.CustBank, bc.Entity.IsExternal,
+                    //        //    user.Entity.UserName, "update", "5218E3ED752A49D4");
+                    //        ////同步客户大数据
 
-                    if (r <= 0)
-                        flag = "2";
-                    else
-                    {
-                        try
-                        {
-                            //同步艾众管家
-                            ButlerSrv.AppService service = new ButlerSrv.AppService();
-                            service.SetCustomer(bc.Entity.CustNo, bc.Entity.CustName, bc.Entity.CustShortName, bc.Entity.CustType, bc.Entity.Representative,
-                                bc.Entity.BusinessScope, bc.Entity.CustLicenseNo, bc.Entity.RepIDCard, bc.Entity.CustContact, bc.Entity.CustTel,
-                                bc.Entity.CustContactMobile, bc.Entity.CustEmail, bc.Entity.CustBankTitle, bc.Entity.CustBankAccount, bc.Entity.CustBank, bc.Entity.IsExternal,
-                                user.Entity.UserName, "update", "5218E3ED752A49D4");
-
-                            WOService.WebService service1 = new WOService.WebService();
-                            service1.Url = wopath;
-                            service1.SetCustomer(bc.Entity.CustNo, bc.Entity.CustName, bc.Entity.CustShortName, bc.Entity.CustType, bc.Entity.Representative,
-                                bc.Entity.BusinessScope, bc.Entity.CustLicenseNo, bc.Entity.RepIDCard, bc.Entity.CustContact, bc.Entity.CustTel,
-                                bc.Entity.CustContactMobile, bc.Entity.CustEmail, bc.Entity.CustBankTitle, bc.Entity.CustBankAccount, bc.Entity.CustBank, bc.Entity.IsExternal,
-                                user.Entity.UserName, "update", "5218E3ED752A49D4");
-                        }
-                        catch { }
-                    }
+                    //    }
+                    //    catch (Exception ex)
+                    //    {
+                    //        Console.WriteLine(ex.ToString());
+                    //    }
+                    //} 
+                    #endregion
                 }
                 else
                 {
@@ -320,43 +330,48 @@ namespace project.Presentation.Base
                         bc.Entity.CustBankAccount = jp.getValue("CustBankAccount");
                         bc.Entity.CustBank = jp.getValue("CustBank");
                         bc.Entity.IsExternal = (jp.getValue("IsExternal") == "1");
-
                         bc.Entity.CustStatus = "3";
                         bc.Entity.CustCreator = user.Entity.UserName;
                         bc.Entity.CustCreateDate = GetDate();
+                        if (!bc.DataOpration("insert", user.Entity.UserName, out msg)) flag = "2";
+                        #region odl
+                        //int r = bc.Save("insert");
+                        //if (r <= 0)
+                        //    flag = "2";
+                        //else 
+                        //{
+                        //    try
+                        //    {
+                        //        //bc.ButlerSync("insert", user.Entity.UserName);//管家
+                        //        //bc.WOSync("insert", user.Entity.UserName);//工单
+                        //        //bc.CustomerSystemSync("insert");//客户
+                        //        ////同步艾众管家
+                        //        //ButlerSrv.AppService service = new ButlerSrv.AppService();
+                        //        //service.SetCustomer(bc.Entity.CustNo, bc.Entity.CustName, bc.Entity.CustShortName, bc.Entity.CustType, bc.Entity.Representative,
+                        //        //    bc.Entity.BusinessScope, bc.Entity.CustLicenseNo, bc.Entity.RepIDCard, bc.Entity.CustContact, bc.Entity.CustTel,
+                        //        //    bc.Entity.CustContactMobile, bc.Entity.CustEmail, bc.Entity.CustBankTitle, bc.Entity.CustBankAccount, bc.Entity.CustBank, bc.Entity.IsExternal,
+                        //        //    user.Entity.UserName, "insert", "5218E3ED752A49D4");
 
-                        int r = bc.Save("insert");
-                        if (r <= 0)
-                            flag = "2";
-                        else 
-                        {
-                            try
-                            {
-                                //同步艾众管家
-                                ButlerSrv.AppService service = new ButlerSrv.AppService();
-                                service.SetCustomer(bc.Entity.CustNo, bc.Entity.CustName, bc.Entity.CustShortName, bc.Entity.CustType, bc.Entity.Representative,
-                                    bc.Entity.BusinessScope, bc.Entity.CustLicenseNo, bc.Entity.RepIDCard, bc.Entity.CustContact, bc.Entity.CustTel,
-                                    bc.Entity.CustContactMobile, bc.Entity.CustEmail, bc.Entity.CustBankTitle, bc.Entity.CustBankAccount, bc.Entity.CustBank, bc.Entity.IsExternal,
-                                    user.Entity.UserName, "insert", "5218E3ED752A49D4");
-
-                                WOService.WebService service1 = new WOService.WebService();
-                                service1.Url = wopath;
-                                service1.SetCustomer(bc.Entity.CustNo, bc.Entity.CustName, bc.Entity.CustShortName, bc.Entity.CustType, bc.Entity.Representative,
-                                    bc.Entity.BusinessScope, bc.Entity.CustLicenseNo, bc.Entity.RepIDCard, bc.Entity.CustContact, bc.Entity.CustTel,
-                                    bc.Entity.CustContactMobile, bc.Entity.CustEmail, bc.Entity.CustBankTitle, bc.Entity.CustBankAccount, bc.Entity.CustBank, bc.Entity.IsExternal,
-                                    user.Entity.UserName, "insert", "5218E3ED752A49D4");
-                            }
-                            catch { }
-                        }
+                        //        //WOService.WebService service1 = new WOService.WebService();
+                        //        //service1.Url = wopath;
+                        //        //service1.SetCustomer(bc.Entity.CustNo, bc.Entity.CustName, bc.Entity.CustShortName, bc.Entity.CustType, bc.Entity.Representative,
+                        //        //    bc.Entity.BusinessScope, bc.Entity.CustLicenseNo, bc.Entity.RepIDCard, bc.Entity.CustContact, bc.Entity.CustTel,
+                        //        //    bc.Entity.CustContactMobile, bc.Entity.CustEmail, bc.Entity.CustBankTitle, bc.Entity.CustBankAccount, bc.Entity.CustBank, bc.Entity.IsExternal,
+                        //        //    user.Entity.UserName, "insert", "5218E3ED752A49D4");
+                        //    }
+                        //    catch { }
+                        //} 
+                        #endregion
                     }
                 }
             }
-            catch { flag = "2"; }
-
+            catch (Exception ex) { flag = "2"; msg = ex.ToString(); }
 
             collection.Add(new JsonStringValue("type", "submit"));
             collection.Add(new JsonStringValue("flag", flag));
-            collection.Add(new JsonStringValue("liststr", createList(jp.getValue("CustNoS"), jp.getValue("CustNameS"), jp.getValue("CustTypeS"), jp.getValue("CustStatusS"), ParseIntForString(jp.getValue("page")))));
+            collection.Add(new JsonStringValue("msg", msg));
+            if (flag == "1")
+                collection.Add(new JsonStringValue("liststr", createList(jp.getValue("CustNoS"), jp.getValue("CustNameS"), jp.getValue("CustTypeS"), jp.getValue("CustStatusS"), ParseIntForString(jp.getValue("page")))));
 
             return collection.ToString();
         }

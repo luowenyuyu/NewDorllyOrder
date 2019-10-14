@@ -293,7 +293,7 @@
                     <%--<td class="tdr2"><%=SRVNo4Str %></td>--%>
                     <td class="tdr2">
                         <select class="input-text size-MINI" id="SRVNo4" data-provider="">
-                            <option value="">暂无数据</option>
+                            <option value="">请选择</option>
                         </select></td>
                 </tr>
                 <tr>
@@ -762,7 +762,7 @@
                 if (vjson.flag == "1") {
                     layer.open({
                         type: 1,
-                        area: ["900px", "600px"],
+                        area: ["960px", "600px"],
                         fix: true,
                         maxmin: true,
                         scrollbar: false,
@@ -805,7 +805,7 @@
             if (vjson.type == "getfee") {
                 if (vjson.flag == "1") {
                     if (vjson.feestr != "") {
-                        $("#SRVNo4 option").remove();
+                        $("#SRVNo4 option:not(:first-of-type)").remove();
                         $("#SRVNo4").append(vjson.feestr);
                         //$("#SRVNo4").val(vjson.feestr);
                         $("#SRVNo4").attr("data-provider", $("#ContractSPNo").val());
@@ -1313,10 +1313,12 @@
             itemtp4 = "insert";
             itemid4 = "";
 
-            $("#SRVNo4").val("<%=PTRentSRVNo %>");
-            $("#RMID3").val("");
+           <%-- $("#SRVNo4").val("<%=PTRentSRVNo %>");--%>
+            <%--$("#RMID3").val("");
             $("#RMArea1").val("");
-            $("#UnitPrice1").val("<%=PTRentFee %>");
+            $("#UnitPrice1").val("<%=PTRentFee %>");--%>
+            $("#SRVNo4").val("");
+            $("#UnitPrice1").val("");
             $("#Remark4").val("");
         }
 

@@ -152,7 +152,7 @@ public class Service : System.Web.Services.WebService
             detail.Entity.ODUnit = "";
             detail.Entity.ODUnitPrice = amount;
             detail.Entity.ODARAmount = amount;
-            detail.Entity.ODCANo = bs.Entity.CANo;
+            detail.Entity.ODCANo = bs.Entity.SRVFinanceFeeCode;
             detail.Entity.ODCreator = "艾众管家";
             detail.Entity.ODCreateDate = now;
             detail.Entity.ODLastReviser = "艾众管家";
@@ -237,7 +237,7 @@ public class Service : System.Web.Services.WebService
             detail.Entity.ODUnit = "";
             detail.Entity.ODUnitPrice = amount;
             detail.Entity.ODARAmount = amount;
-            detail.Entity.ODCANo = bs.Entity.CANo;
+            detail.Entity.ODCANo = bs.Entity.SRVFinanceFeeCode;
             detail.Entity.ODCreator = "艾众管家";
             detail.Entity.ODCreateDate = now;
             detail.Entity.ODLastReviser = "艾众管家";
@@ -322,7 +322,7 @@ public class Service : System.Web.Services.WebService
             detail.Entity.ODUnit = "";
             detail.Entity.ODUnitPrice = amount;
             detail.Entity.ODARAmount = amount;
-            detail.Entity.ODCANo = bs.Entity.CANo;
+            detail.Entity.ODCANo = bs.Entity.SRVFinanceFeeCode;
             detail.Entity.ODCreator = "工单系统";
             detail.Entity.ODCreateDate = now;
             detail.Entity.ODLastReviser = "工单系统";

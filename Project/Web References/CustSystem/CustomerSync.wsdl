@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://tempuri.org/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://tempuri.org/">
+      <s:element name="HelloWorld">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="hello" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="HelloWorldResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="HelloWorldResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="CustomerInsert">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="customerInfo" type="tns:CustomerInfo" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="CustomerInfo">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="SN" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="CustNo" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="ParkNo" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="SourceSystem_ShortName" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="SoftwareInstance_ShortName" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="CustName" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="CustShortName" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="CustType" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Representative" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="BusinessScope" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="CustLicenseNO" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="RepIDCard" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="CustContact" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="CustContactPersonJob" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="CustTel" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="CustContactMobile" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="CustEmail" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="CustBankTitle" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="CustBankAccount" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="CustBank" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="CustStatus" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="CustCreateDate" nillable="true" type="s:dateTime" />
+          <s:element minOccurs="1" maxOccurs="1" name="UpdateTime" nillable="true" type="s:dateTime" />
+          <s:element minOccurs="0" maxOccurs="1" name="CustCreator" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="IsExternal" type="s:short" />
+          <s:element minOccurs="1" maxOccurs="1" name="RetireDate" nillable="true" type="s:dateTime" />
+          <s:element minOccurs="0" maxOccurs="1" name="CustIdOnCenterServer" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="CustomerInsertResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="CustomerInsertResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="CustomerDelete">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="softwareInstanceShortName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="custIdOnCenterServer" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="CustomerDeleteResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="CustomerDeleteResult" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="CustomerUpdate">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="customerInfo" type="tns:CustomerInfo" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="CustomerUpdateResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="CustomerUpdateResult" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="FetchIndustrialParkList">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="keyWord" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="FetchIndustrialParkListResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="FetchIndustrialParkListResult" type="tns:ArrayOfIndustrialPark" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfIndustrialPark">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="IndustrialPark" nillable="true" type="tns:IndustrialPark" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="IndustrialPark">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="SN" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="IndustrialParkName" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="FetchSourceSystemList">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="keyWord" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="FetchSourceSystemListResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="FetchSourceSystemListResult" type="tns:ArrayOfSourceSystem" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfSourceSystem">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="SourceSystem" nillable="true" type="tns:SourceSystem" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="SourceSystem">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="ShortName" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="SourceSystemName" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="FetchSoftwareInstanceList">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="keyWord" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="FetchSoftwareInstanceListResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="FetchSoftwareInstanceListResult" type="tns:ArrayOfSoftwareInstance" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfSoftwareInstance">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="SoftwareInstance" nillable="true" type="tns:SoftwareInstance" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="SoftwareInstance">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="ShortName" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="SoftwareInstanceName" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="HelloWorldSoapIn">
+    <wsdl:part name="parameters" element="tns:HelloWorld" />
+  </wsdl:message>
+  <wsdl:message name="HelloWorldSoapOut">
+    <wsdl:part name="parameters" element="tns:HelloWorldResponse" />
+  </wsdl:message>
+  <wsdl:message name="CustomerInsertSoapIn">
+    <wsdl:part name="parameters" element="tns:CustomerInsert" />
+  </wsdl:message>
+  <wsdl:message name="CustomerInsertSoapOut">
+    <wsdl:part name="parameters" element="tns:CustomerInsertResponse" />
+  </wsdl:message>
+  <wsdl:message name="CustomerDeleteSoapIn">
+    <wsdl:part name="parameters" element="tns:CustomerDelete" />
+  </wsdl:message>
+  <wsdl:message name="CustomerDeleteSoapOut">
+    <wsdl:part name="parameters" element="tns:CustomerDeleteResponse" />
+  </wsdl:message>
+  <wsdl:message name="CustomerUpdateSoapIn">
+    <wsdl:part name="parameters" element="tns:CustomerUpdate" />
+  </wsdl:message>
+  <wsdl:message name="CustomerUpdateSoapOut">
+    <wsdl:part name="parameters" element="tns:CustomerUpdateResponse" />
+  </wsdl:message>
+  <wsdl:message name="FetchIndustrialParkListSoapIn">
+    <wsdl:part name="parameters" element="tns:FetchIndustrialParkList" />
+  </wsdl:message>
+  <wsdl:message name="FetchIndustrialParkListSoapOut">
+    <wsdl:part name="parameters" element="tns:FetchIndustrialParkListResponse" />
+  </wsdl:message>
+  <wsdl:message name="FetchSourceSystemListSoapIn">
+    <wsdl:part name="parameters" element="tns:FetchSourceSystemList" />
+  </wsdl:message>
+  <wsdl:message name="FetchSourceSystemListSoapOut">
+    <wsdl:part name="parameters" element="tns:FetchSourceSystemListResponse" />
+  </wsdl:message>
+  <wsdl:message name="FetchSoftwareInstanceListSoapIn">
+    <wsdl:part name="parameters" element="tns:FetchSoftwareInstanceList" />
+  </wsdl:message>
+  <wsdl:message name="FetchSoftwareInstanceListSoapOut">
+    <wsdl:part name="parameters" element="tns:FetchSoftwareInstanceListResponse" />
+  </wsdl:message>
+  <wsdl:portType name="CustomerSyncSoap">
+    <wsdl:operation name="HelloWorld">
+      <wsdl:input message="tns:HelloWorldSoapIn" />
+      <wsdl:output message="tns:HelloWorldSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="CustomerInsert">
+      <wsdl:input message="tns:CustomerInsertSoapIn" />
+      <wsdl:output message="tns:CustomerInsertSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="CustomerDelete">
+      <wsdl:input message="tns:CustomerDeleteSoapIn" />
+      <wsdl:output message="tns:CustomerDeleteSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="CustomerUpdate">
+      <wsdl:input message="tns:CustomerUpdateSoapIn" />
+      <wsdl:output message="tns:CustomerUpdateSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="FetchIndustrialParkList">
+      <wsdl:input message="tns:FetchIndustrialParkListSoapIn" />
+      <wsdl:output message="tns:FetchIndustrialParkListSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="FetchSourceSystemList">
+      <wsdl:input message="tns:FetchSourceSystemListSoapIn" />
+      <wsdl:output message="tns:FetchSourceSystemListSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="FetchSoftwareInstanceList">
+      <wsdl:input message="tns:FetchSoftwareInstanceListSoapIn" />
+      <wsdl:output message="tns:FetchSoftwareInstanceListSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="CustomerSyncSoap" type="tns:CustomerSyncSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="HelloWorld">
+      <soap:operation soapAction="http://tempuri.org/HelloWorld" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CustomerInsert">
+      <soap:operation soapAction="http://tempuri.org/CustomerInsert" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CustomerDelete">
+      <soap:operation soapAction="http://tempuri.org/CustomerDelete" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CustomerUpdate">
+      <soap:operation soapAction="http://tempuri.org/CustomerUpdate" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="FetchIndustrialParkList">
+      <soap:operation soapAction="http://tempuri.org/FetchIndustrialParkList" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="FetchSourceSystemList">
+      <soap:operation soapAction="http://tempuri.org/FetchSourceSystemList" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="FetchSoftwareInstanceList">
+      <soap:operation soapAction="http://tempuri.org/FetchSoftwareInstanceList" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="CustomerSyncSoap12" type="tns:CustomerSyncSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="HelloWorld">
+      <soap12:operation soapAction="http://tempuri.org/HelloWorld" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CustomerInsert">
+      <soap12:operation soapAction="http://tempuri.org/CustomerInsert" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CustomerDelete">
+      <soap12:operation soapAction="http://tempuri.org/CustomerDelete" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CustomerUpdate">
+      <soap12:operation soapAction="http://tempuri.org/CustomerUpdate" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="FetchIndustrialParkList">
+      <soap12:operation soapAction="http://tempuri.org/FetchIndustrialParkList" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="FetchSourceSystemList">
+      <soap12:operation soapAction="http://tempuri.org/FetchSourceSystemList" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="FetchSoftwareInstanceList">
+      <soap12:operation soapAction="http://tempuri.org/FetchSoftwareInstanceList" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="CustomerSync">
+    <wsdl:port name="CustomerSyncSoap" binding="tns:CustomerSyncSoap">
+      <soap:address location="http://sync.sesky.cn/CustomerSync.asmx" />
+    </wsdl:port>
+    <wsdl:port name="CustomerSyncSoap12" binding="tns:CustomerSyncSoap12">
+      <soap12:address location="http://sync.sesky.cn/CustomerSync.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

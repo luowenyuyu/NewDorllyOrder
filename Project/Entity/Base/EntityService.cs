@@ -15,12 +15,7 @@ namespace project.Entity.Base
         private string _SRVTypeNo2Name;
         private string _SRVSPNo;
         private string _SRVSPName;
-        private string _CANo;
-        private string _CAName;
-        private string _SRVCalType;
         private string _SRVRoundType;
-        private int _SRVDecimalPoint;
-        private decimal _SRVRate;
         private decimal _SRVTaxRate;
         private bool _SRVStatus;
         private string _SRVRemark;
@@ -111,39 +106,6 @@ namespace project.Entity.Base
         }
 
         /// <summary>
-        /// 功能描述：科目编号
-        /// 长度：30
-        /// 不能为空：否
-        /// </summary>
-        public string CANo
-        {
-            get { return _CANo; }
-            set { _CANo = value; }
-        }
-
-        /// <summary>
-        /// 功能描述：科目名称【非维护字段】
-        /// 长度：50
-        /// 不能为空：否
-        /// </summary>
-        public string CAName
-        {
-            get { return _CAName; }
-            set { _CAName = value; }
-        }
-
-        /// <summary>
-        /// 功能描述：收费方式 [ 1.按出租面积 2.按使用量 3.按天数 4.按次数 5.滞纳 ]
-        /// 长度：10
-        /// 不能为空：否
-        /// </summary>
-        public string SRVCalType
-        {
-            get { return _SRVCalType; }
-            set { _SRVCalType = value; }
-        }
-
-        /// <summary>
         /// 功能描述：取整方式
         /// 长度：10
         /// 不能为空：否
@@ -181,24 +143,6 @@ namespace project.Entity.Base
         }
 
         /// <summary>
-        /// 功能描述：精准位数
-        /// </summary>
-        public int SRVDecimalPoint
-        {
-            get { return _SRVDecimalPoint; }
-            set { _SRVDecimalPoint = value; }
-        }
-
-        /// <summary>
-        /// 功能描述：倍率
-        /// </summary>
-        public decimal SRVRate
-        {
-            get { return _SRVRate; }
-            set { _SRVRate = value; }
-        }
-
-        /// <summary>
         /// 功能描述：税率
         /// </summary>
         public decimal SRVTaxRate
@@ -227,6 +171,37 @@ namespace project.Entity.Base
             get { return _SRVRemark; }
             set { _SRVRemark = value; }
         }
+        /*
+         * 新增字段
+         */
+         /// <summary>
+         /// 费用计算公式
+         /// </summary>
+        public string SRVFormulaID { get; set; }
+        /// <summary>
+        /// 费用单价
+        /// </summary>
+        public decimal SRVPrice { get; set; }
+        /// <summary>
+        /// 费用单价取值方式：1,来源合同;2,来源配置
+        /// </summary>
+        public int SRVPriceType { get; set; }
+        /// <summary>
+        /// 财务费用科目编码
+        /// </summary>
+        public string SRVFinanceFeeCode { get; set; }
+        /// <summary>
+        /// 财务费用科目名称
+        /// </summary>
+        public string SRVFinanceFeeName { get; set; }
+        /// <summary>
+        /// 财务应收科目编码
+        /// </summary>
+        public string SRVFinanceReceivableCode { get; set; }
+        /// <summary>
+        /// 计算周期：0:不收费(未参与合同费用)；1:本月收费；2:下月收费
+        /// </summary>
+        public int SRVCalcCycle { get; set; }
 
     }
 }
